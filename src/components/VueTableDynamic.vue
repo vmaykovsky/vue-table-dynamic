@@ -10,6 +10,11 @@
           <i class="iconfont iconsearch" slot="prefix"></i>
         </vue-input>
       </div>
+      <div class="v-table-loader">
+        <div class="v-linear-activity" v-if="isLoading">
+          <div class="v-line"></div>
+        </div>
+      </div>
       <div 
         class="v-table"
         :class="{ 
@@ -47,7 +52,7 @@
                 @click.stop="onCheckAll(tableData.rows[0])"
               >
                 <i class="iconfont iconcheck" v-show="tableData.rows[0].checked === true"></i> 
-                <i class="iconfont iconminus" v-show="tableData.rows[0].checked === 'indeterminate'"></i>
+                <i class="iconfont iconminus" v-show="tableData.rows[0].checked === 'line'"></i>
               </div>
             </div>
             <div 
@@ -210,7 +215,7 @@
                 @click.stop="onCheckAll(tableData.rows[0])"
               >
                 <i class="iconfont iconcheck" v-show="tableData.rows[0].checked === true"></i> 
-                <i class="iconfont iconminus" v-show="tableData.rows[0].checked === 'indeterminate'"></i>
+                <i class="iconfont iconminus" v-show="tableData.rows[0].checked === 'line'"></i>
               </div>
             </div>
             <div 
@@ -408,7 +413,8 @@ export default {
       fixedTop: 0,
       bodyWidth: null,
       bodyViewerWidth: null,
-      hMovement: 0
+      hMovement: 0,
+      isLoading: false,
     }
   },
   props: {
@@ -1027,7 +1033,7 @@ export default {
         if (this.isAllRowChecked()) {
           this.tableData.rows[0].checked = true
         } else if (this.getCheckedRowNum() > 0) {
-          this.tableData.rows[0].checked = 'indeterminate'
+          this.tableData.rows[0].checked = 'line'
         } else {
           this.tableData.rows[0].checked = false
         }
@@ -1485,7 +1491,7 @@ export default {
           if (checkedRows === (this.tableData.rows.length - 1)) {
             this.tableData.rows[0].checked = true
           } else if (checkedRows > 0) {
-            this.tableData.rows[0].checked = 'indeterminate'
+            this.tableData.rows[0].checked = 'line'
           } else {
             this.tableData.rows[0].checked = false
           }
@@ -1651,6 +1657,64 @@ $fontFamily: Arial, Helvetica, sans-serif;
   width: 100%;
   box-sizing: border-box;
   overflow: hidden;
+}
+
+.v-table-loader {
+  overflow: hidden;
+  width: 100%;
+  height: 3px;
+}
+
+.v-linear-activity {
+  overflow: hidden;
+  width: 100%;
+  height: 3px;
+  background-color: #B3E5FC;
+  margin: 0 auto;
+}
+
+.v-line {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.v-line:before {
+  content: '';
+  position: absolute;
+  height: 100%;
+  background-color: #03A9F4;
+  animation: line_first 1.5s infinite ease-out;
+}
+
+.v-line:after {
+  content: '';
+  position: absolute;
+  height: 100%;
+  background-color: #4FC3F7;
+  animation: line_second 1.5s infinite ease-in;
+}
+
+@keyframes line_first {
+  0% {
+    left: -100%;
+    width: 100%;
+  }
+  100% {
+    left: 100%;
+    width: 10%;
+  }
+}
+
+@keyframes line_second {
+  0% {
+    left: -150%;
+    width: 100%;
+  }
+  100% {
+    left: 100%;
+    width: 10%;
+  }
 }
 
 .v-table-fixed{

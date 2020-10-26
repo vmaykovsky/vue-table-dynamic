@@ -33,6 +33,7 @@
         <div class="aside-line"></div>
         <vue-button class="aside-btns" size="mini" @click="getData">Get Data</vue-button>
         <vue-button class="aside-btns" size="mini" @click="getCheckedRowDatas">Checked Row Data</vue-button>
+        <vue-button class="aside-btns" size="mini" @click="getToggleLoader">Toggle Loader</vue-button>
       </vuescroll>
     </aside>
     <section>
@@ -65,6 +66,7 @@
 </template>
 
 <script>
+import VueTableDynamic from '../../../src/components/VueTableDynamic.vue'
 import NavMenu from './NavMenu.vue'
 import VueButton from './VueButton.vue'
 import VueMsg from 'vue-msgs'
@@ -326,6 +328,11 @@ export default {
         console.log('[ isAllRowChecked ] ', this.$refs.table.isAllRowChecked())
       }
     },
+    getToggleLoader() {
+      if (this.$refs && this.$refs.table) {
+        this.$refs.table.isLoading = !this.$refs.table.isLoading;
+      }
+    },
     reset () {
       this.params = cloneDeep(defaultTableParams)
     },
@@ -374,7 +381,7 @@ export default {
       }
     }
   },
-  components: { NavMenu, VueButton, VueMsg, vuescroll }
+  components: { NavMenu, VueButton, VueMsg, vuescroll, VueTableDynamic }
 }
 </script>
 
