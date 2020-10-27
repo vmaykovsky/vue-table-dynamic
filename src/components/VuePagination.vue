@@ -69,10 +69,10 @@ export default {
     return {
       clickOutside: null,
       pages: [],
-      size: 10, // 每页显示数量
+      size: 10, // Display quantity per page
       showPageSizeOptions: false,
-      pageCount: 1, // 页数
-      currentPage: 1 // 当前页编号
+      pageCount: 1, // Number of pages
+      currentPage: 1 // Current page number
     }
   },
   props: {
@@ -151,13 +151,13 @@ export default {
       this.toPage(this.currentPage + 1)
     },
     /**
-     *  page数小于pageCountMax时，全部显示
-     *  page数大于pageCountMax时，page视图分三种，[ 1 ---> thresholdLeft ---> thresholdRight ---> pageCount ]
-     *  根据当前激活page编号，显示对应视图
-     *  第一种 [1, thresholdLeft]: 1到pageCountMax-2依次显示page最前面编号, pageCountMax-1显示..., pageCountMax显示pageCount
-     *  第二种 (thresholdLeft, thresholdRight): 1...pages...pageCount
-     *  第三种 [thresholdRight, pageCount]: 1显示page1, 2显示..., 3到pageCountMax依次显示page最后面编号
-     */
+      * When the number of pages is less than pageCountMax, all are displayed
+      * When the number of pages is greater than pageCountMax, there are three types of page views, [1 ---> thresholdLeft ---> thresholdRight ---> pageCount]
+      * According to the currently active page number, the corresponding view is displayed
+      * The first type [1, thresholdLeft]: 1 to pageCountMax-2 display the top number of the page in turn, pageCountMax-1 displays..., pageCountMax displays pageCount
+      * The second type (thresholdLeft, thresholdRight): 1...pages...pageCount
+      * The third type [thresholdRight, pageCount]: 1 displays page1, 2 displays..., 3 to pageCountMax displays the last page number in turn
+      */
     toPage (tagetPage) {
       if (this.disabled) return
       if (tagetPage < 1 || tagetPage > this.pageCount) return

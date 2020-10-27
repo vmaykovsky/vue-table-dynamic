@@ -43,9 +43,9 @@ export default {
     }
   },
   props: {
-    scrolling: Number, //视图水平方向滚动的百分比
-    wrapperWidth: Number, // 包装层（可视区）宽度
-    viewerWidth: Number, // 视图宽度
+    scrolling: Number, // The percentage of view scrolling horizontally
+    wrapperWidth: Number, // Packaging layer (viewable area) width
+    viewerWidth: Number, // View width
     color: { type: String, default: '#DFDFDF' },
     xBarDisplay: { type: String, default: 'hover' },
     size: { type: Number, default: 6 },
@@ -63,8 +63,8 @@ export default {
   mounted () {
     this.calculateSize(this)
 
-    // mousedown + mousemove + mouseup 实现滚动条拖动效果
-    // mousemove和mouseup绑定到document，鼠标移到滚动条外部时，仍能拖动
+    // mousedown + mousemove + mouseup Realize the scroll bar drag effect
+    // mousemove and mouseup are bound to the document, when the mouse is moved outside the scroll bar, it can still be dragged
     document.addEventListener("mousemove", this.onDrag)
     document.addEventListener("mouseup", this.stopDrag)
 
@@ -118,7 +118,7 @@ export default {
     }
   },
   methods: {
-    // 鼠标按下 => 开始拖动
+    // Mouse down => start dragging
     startDrag (e) {
       e.preventDefault()
       e.stopPropagation()
@@ -128,21 +128,22 @@ export default {
       this.dragging = true
       this.start = e.clientX
     },
-    // 鼠标移动 => 拖动进行中
-    // 根据鼠标在s水平方向移动距离计算新的滚动位置next（百分比），父组件根据next调整视图的marginLeft，并更新scrolling值，反馈到滚动条的位移上
+    // Mouse movement => Drag in progress
+    // Calculate the new scroll position next (percentage) according to the distance of the mouse in the horizontal direction of s. 
+    // The parent component adjusts the marginLeft of the view according to next, and updates the scrolling value, which is fed back to the displacement of the scroll bar
     onDrag(e) {
       if (this.handleDrag) {
         this.handleDrag(e)
       }
     },
-    // 鼠标松开 => 停止拖动
+    // Release the mouse => stop dragging
     stopDrag(e){
       if(this.dragging){
         this.$emit('drag-stop')
         this.dragging = false
       }
     },
-    // 点击滚动槽，快速滚动到指定位置
+    // Click the scroll slot to quickly scroll to the specified position
     onClick (e) {
       if (e.target === this.$refs.container) {
         let position = this.$refs.scrollbar.getBoundingClientRect()
@@ -157,7 +158,7 @@ export default {
         this.$emit('change-position', next, 'horizontal')
       }
     },
-    // 计算滚动条宽度(百分比)
+    // Calculate the scroll bar width (percentage)
     calculateSize(source){
       this.width = source.wrapperWidth / source.viewerWidth * 100
     },

@@ -418,32 +418,32 @@ export default {
     }
   },
   props: {
-    // 表格相关信息
-    // params.data: （二维矩阵）表格数据
-    // params.header: (String) 表头类型。 'row': 第一行作为表头； 'column': 第一列作为表头； ''/'none'/other: 无表头。 默认无
-    // params.border: (Boolean) 是否带边框。默认不带
-    // params.stripe: (Boolean) 行背景间隔条纹显示。默认false
-    // params.highlight: (Object) 配置高亮背景的 行/列/表单元
-    // params.highlightedColor: (String) 高亮背景的颜色。
-    // params.wordWrap: (String) 表格单元中文本的长单词换行 'normal/break-word'  默认normal
-    // params.whiteSpace: (String) 表格单元中文本的空白处理 'nowrap/normal/pre/pre-wrap/pre-line'  默认nowrap
-    // params.textOverflow: (String) 表格单元中文本溢出处理 'clip/ellipsis'  默认clip
-    // params.showCheck: (Boolean) 是否在第一列前显示多选（勾选）框。 默认不显示。  注：仅当params.header为'row时，第一行第一列为'全选'框，否则第一列均为当前行的勾选框
-    // params.enableSearch: (Boolean) 启用搜索功能。默认禁用
-    // params.minWidth: (Number) table最小宽度。默认100
-    // params.maxWidth: (Number) table最大宽度。默认10000
-    // params.height: (Number) table高度。
-    // params.headerHeight: (Number) table header高度。默认30
-    // params.rowHeight: (Number) table row高度。默认30
-    // params.columnWidth: (Array) 指定某一列或某几列的宽度，剩余列宽度均分. [{column: 0, width: 80}, {column: 1, width: '20%'}]
-    // params.sort: (Array) 指定以某列为基准排序。如指定第1列和第二列可排序：[0, 1]。 只在配置了第一行作为表头时有效
-    // params.edit: (Object) 配置可编辑的 行/列/表单元。 如：{ row: [2, 3, ... ], column: [3, 4, ... ], cell: [[4, 4], [5, 6], ... ] } ；负数表示倒序（如-1为最后1行/列）；row: 'all' 所有行
-    //                      编辑会改变表格显示的数据，不会改变传入的源数据。调用组件方法获取表格数据时，返回编辑后的数据。表头不可编辑。默认禁用
-    // params.filter: (Array) 配置基于列的筛选。如： [{column: 0, content: [{text: '> 5', value: 5}], method: (value, tableCell) => { ... }}]
-    // params.activedColor: (string) 表头排序/过滤按钮激活后的颜色
-    // params.pagination: (Boolean) 是否启用分页功能。默认false
-    // params.pageSize: (Number) 每页显示条数
-    // params.pageSizes: (Array) 每页显示条数的可选值
+    // Form related information
+    // params.data: (two-dimensional matrix) table data
+    // params.header: (String) header type. 'row': the first row as the header;'column': the first column as the header;''/'none'/other: no header. Default none
+    // params.border: (Boolean) Whether to have a border. Without default
+    // params.stripe: (Boolean) The line background interval stripe display. Default false
+    // params.highlight: (Object) Configure the row/column/table unit of the highlighted background
+    // params.highlightedColor: (String) The color of the highlighted background.
+    // params.wordWrap: (String) Wrap long words of text in table cells'normal/break-word' default normal
+    // params.whiteSpace: (String) Blank handling of text in table cells'nowrap/normal/pre/pre-wrap/pre-line' default nowrap
+    // params.textOverflow: (String) text overflow handling in table cells'clip/ellipsis' default clip
+    // params.showCheck: (Boolean) Whether to show the multi-select (check) box in front of the first column. Not displayed by default. Note: Only when params.header is'row, the first column of the first row is the'select all' box, otherwise the first column is the check box of the current row
+    // params.enableSearch: (Boolean) Enable the search function. Disabled by default
+    // params.minWidth: (Number) The minimum width of the table. Default 100
+    // params.maxWidth: (Number) The maximum width of the table. Default 10000
+    // params.height: (Number) table height.
+    // params.headerHeight: (Number) table header height. Default 30
+    // params.rowHeight: (Number) table row height. Default 30
+    // params.columnWidth: (Array) Specify the width of a certain column or certain columns, and the remaining column widths are equally divided. [{column: 0, width: 80}, {column: 1, width: '20%'}]
+    // params.sort: (Array) Specify sorting based on a certain column. If you specify the first and second columns, you can sort: [0, 1]. Only valid when the first row is configured as the header
+    // params.edit: (Object) Configure the editable row/column/table unit. Such as: {row: [2, 3, ... ], column: [3, 4, ... ], cell: [[4, 4], [5, 6], ...]}; negative number means Reverse order (such as -1 is the last row/column); row:'all' all rows
+    // Editing will change the data displayed in the table, but will not change the incoming source data. When calling the component method to get the table data, the edited data is returned. The header cannot be edited. Disabled by default
+    // params.filter: (Array) Configure column-based filtering. Such as: [{column: 0, content: [{text:'> 5', value: 5}], method: (value, tableCell) => {... }}]
+    // params.activedColor: (string) The color of the header sorting/filtering button after activation
+    // params.pagination: (Boolean) Whether to enable the paging function. Default false
+    // params.pageSize: (Number) The number of items displayed per page
+    // params.pageSizes: (Array) Optional value of the number of items displayed per page
     params: { type: Object, default: () => { return {} } }
   },
   computed: {
@@ -722,7 +722,7 @@ export default {
   },
   methods: {
     /**
-   * @function 初始化Table数据
+   * @function Initialize table data
    */
     initData (sourceData) {
       if (this.params && is2DMatrix(sourceData)) {
@@ -752,7 +752,7 @@ export default {
       })
     },
     /**
-   * @function 更新分页数据
+   * @function Update paging data
    */
     updatePagination () {
       if (!this.pagination) return
@@ -767,8 +767,8 @@ export default {
       }
     },
     /**
-   * @function 当前页编号改变
-   * @param {Number} page 页编号
+   * @function Current page number change
+   * @param {Number} page number
    */
     onPageChange (page) {
       if (!this.pagination) return
@@ -787,15 +787,15 @@ export default {
       this.$nextTick(this.updateActivatedRows)
     },
     /**
-   * @function 每页显示条数切换事件
+   * @function Display the number of switching events per page
    */
     onPageSizeChange (size) {
       if (!this.pagination) return
       this.pageSize = size
     },
     /**
-   * @function 跳转到目标页
-   * @param {Number} tagetPage 页编号
+   * @function Jump to the target page
+   * @param {Number} tagetPage Page number
    */
     toPage (tagetPage) {
       if (!this.pagination) return
@@ -806,7 +806,7 @@ export default {
       }
     },
     /**
-   * @function 获取Cell的样式数据
+   * @function Get cell style data
    */
     getCellStyle (rowIndex, columnIndex) {
       let style = {}
@@ -831,12 +831,12 @@ export default {
       }
     },
     /**
-     * @function 根据输入列宽配置计算行最小宽度
-     *           1. 没有配置列宽：继承父容器宽度
-     *           2. 仅配置了部分（或全部）列宽为绝对像素值：配置的像素值之和 + 剩余列 * 列最小宽度 + 多选列宽度(如果启用了多选)
-     *           3. 全部列均配置为相对百分比：继承父容器宽度
-     *           4. 部分列配置为相对百分比，部分列配置为绝对像素值：(配置的像素值之和(如果有) + 剩余列(如果有) * 列最小宽度 + 多选列宽度(如果启用了多选)) * 100 / (100 - 配置的百分比之和)
-     */
+      * @function calculates the minimum row width based on the input column width configuration
+      * 1. Column width is not configured: inherit the width of the parent container
+      * 2. Only part (or all) of the column width is configured as an absolute pixel value: the sum of the configured pixel values + the remaining columns * the minimum width of the column + the width of the multi-selection column (if multi-selection is enabled)
+      * 3. All columns are configured as relative percentages: inherit the width of the parent container
+      * 4. Some columns are configured as relative percentages, and some columns are configured as absolute pixel values: (sum of configured pixel values (if any) + remaining columns (if any) * minimum column width + multi-choice column width (if multiple columns are enabled) Optional)) * 100 / (100-the sum of configured percentages)
+      */
     getRowMinWidth () {
       let columnMinWidth = 80
       let checkColumnWidth = this.showCheck ? 50 : 0
@@ -848,8 +848,8 @@ export default {
       if (!(keys.length > 0)) {
         return defaultMinWidth
       } else {
-        let abs = { total: 0, count: 0 } // 绝对像素值
-        let pct = { total: 0, count: 0 } // 相对百分比
+        let abs = { total: 0, count: 0 } // Absolute pixel value
+        let pct = { total: 0, count: 0 } // Relative percentage
 
         for (let i = 0; i < keys.length; i++) {
           if (keys[i] >= columnNum) continue
@@ -908,8 +908,8 @@ export default {
     },
     /**
    * @function 检查Cell是否可编辑
-   * @param {Number} rowIndex 行索引
-   * @param {Number} columnIndex 列索引
+   * @param {Number} rowIndex
+   * @param {Number} columnIndex
    */
     isEditable (rowIndex, columnIndex) {
       if (!(this.editConfig && (this.editConfig.row || this.editConfig.column || this.editConfig.cell))) return false
@@ -1004,8 +1004,8 @@ export default {
       return {}
     },
     /**
-   * @function 勾选所有Row
-   * @param {Object} tableRow 第一行表头
+   * @function Check all Row
+   * @param {Object} tableRow First row header
    */
     onCheckAll (tableRow) {
       if (!this.showCheck) return
@@ -1020,9 +1020,9 @@ export default {
       )
     },
     /**
-   * @function 勾选单个Row
-   * @param {Object} tableRow Row数据对象
-   * @param {Number} rowIndex 行索引
+   * @function Check a single Row
+   * @param {Object} tableRow Row data object
+   * @param {Number} rowIndex
    */
     onCheckRow (tableRow, rowIndex) {
       if (!this.showCheck) return
@@ -1048,17 +1048,17 @@ export default {
       )
     },
     /**
-   * @function 单击Row事件
-   * @param {Object} tableRow Row数据对象
-   * @param {Number} rowIndex 行索引
+   * @function Click Row event
+   * @param {Object} tableRow Row data object
+   * @param {Number} rowIndex
    */
     onClickRow (tableRow, rowIndex) {
       this.$emit('row-click', rowIndex, this.getRowDataFromTableRow(tableRow))
     },
     /**
-   * @function 鼠标进入Row事件
-   * @param {Object} tableRow Row数据对象
-   * @param {Boolean} isFixedBody 是否为固定列中的row
+   * @function Mouse enters Row event
+   * @param {Object} tableRow Row data object
+   * @param {Boolean} isFixedBody Whether it is row in a fixed column
    */
     onMouseenter (tableRow, isFixedBody = false) {
       tableRow.hovering = true
@@ -1067,9 +1067,9 @@ export default {
       }
     },
     /**
-   * @function 鼠标离开Row事件
-   * @param {Object} tableRow Row数据对象
-   * @param {Boolean} isFixedBody 是否为固定列中的row
+   * @function Mouse left Row event
+   * @param {Object} tableRow Row data object
+   * @param {Boolean} isFixedBody Whether it is row in a fixed column
    */
     onMouseleave (tableRow, isFixedBody = false) {
       tableRow.hovering = false
@@ -1091,28 +1091,28 @@ export default {
       }
     },
     /**
-   * @function 单击Cell事件
-   * @param {Object} tableCell Cell数据对象
-   * @param {Number} rowIndex 行索引
-   * @param {Number} columnIndex 列索引
+   * @function Click Cell event
+   * @param {Object} tableCell Cell data object
+   * @param {Number} rowIndex
+   * @param {Number} columnIndex
    */
     onClickCell (tableCell, rowIndex, columnIndex) {
       this.$emit('cell-click', rowIndex, columnIndex, tableCell.data)
     },
     /**
-   * @function 双击Cell事件
-   * @param {Object} tableCell Cell数据对象
-   * @param {Number} rowIndex 行索引
-   * @param {Number} columnIndex 列索引
+   * @function Double-click Cell event
+   * @param {Object} tableCell Cell data object
+   * @param {Number} rowIndex
+   * @param {Number} columnIndex
    */
     onDblclickCell (tableCell, rowIndex, columnIndex) {
       this.$emit('cell-dblclick', rowIndex, columnIndex, tableCell.data)
     },
     /**
-   * @function Cell失去焦点. 如果启用了编辑功能，则用当前输入更新数据。如果源数据是number类型，则输入为number时才有效
-   * @param {Object} tableCell Cell数据对象
-   * @param {Number} rowIndex 行索引
-   * @param {Number} columnIndex 列索引
+   * @function The cell loses focus. If the editing function is enabled, the data is updated with the current input. If the source data is of type number, only valid when the input is number
+   * @param {Object} tableCell Cell data object
+   * @param {Number} rowIndex
+   * @param {Number} columnIndex
    */
     onCellBlur (tableCell, rowIndex, columnIndex) {
       if (!this.isEditable(rowIndex, columnIndex)) return
@@ -1139,9 +1139,9 @@ export default {
     onCellKeyEnter (e) {
     },
     /**
-   * @function 基于某一列数据排序
-   * @param {Number} index 列索引
-   * @param {String} value ascending：升序； descending：降序
+   * @function Sort based on a column of data
+   * @param {Number} index Column index
+   * @param {String} value ascending/descending
    */
     onSort (index, value) {
       if (!(this.tableData && this.tableData.rows && this.tableData.rows.length > 0)) return
@@ -1151,7 +1151,7 @@ export default {
       this.activatedSort = {}
       this.activatedSort[index] = value
 
-      // 默认排序规则
+      // Default collation
       let ascending = (a, b) => { 
         if (a === b) { return 0 }
         else { return a > b ? 1 : -1 }
@@ -1161,7 +1161,7 @@ export default {
         else { return b > a ? 1 : -1 }
       }
 
-      // 自定义排序规则
+      // Custom collation
       if (this.sortConfig && this.sortConfig[index]) {
         if (typeof this.sortConfig[index].ascending === 'function') {
           ascending = this.sortConfig[index].ascending
@@ -1188,10 +1188,10 @@ export default {
       this.$nextTick(this.updatePagination)
     },
     /**
-   * @function 基于某一列数据筛选
-   * @param {Number} columnIndex 列索引
-   * @param {Array} checked 选中的筛选条件
-   * @param {Object} config 该列的筛选配置
+   * @function Filter based on a column of data
+   * @param {Number} columnIndex
+   * @param {Array} checked Selected filter
+   * @param {Object} config Filter configuration for this column
    */
     onFilter (columnIndex, checked, config) {
       if (!(this.tableData && this.tableData.rows)) return
@@ -1212,7 +1212,7 @@ export default {
       this.updateFilteredRows()
     },
     /**
-   * @function 更新行筛选状态
+   * @function Update row filter status
    */
     updateFilteredRows () {
       this.tableData.rows.forEach(row => {
@@ -1226,8 +1226,8 @@ export default {
       this.$nextTick(this.updatePagination)
     },
     /**
-   * @function 清除筛选状态
-   * @param {Number} columnIndex 列索引。传入列索引时，对该列清除；不传索引时，清除所有筛选
+   * @function Clear filter status
+   * @param {Number} columnIndex Column index. When the column index is passed in, the column is cleared; when the index is not passed, all filters are cleared
    */
     clearFilter (columnIndex) {
       if (typeof columnIndex === 'number') {
@@ -1249,10 +1249,10 @@ export default {
       this.updateFilteredRows()
     },
     /**
-   * @function 按关键字搜索，显示匹配的行
-   * @param {String} searchValue 关键字
-   * @param {Array} included 在指定的列里进行匹配
-   * @param {Array} excluded 不在指定的列里匹配。优先级高于included
+   * @function Search by keyword, show matching rows
+   * @param {String} searchValue Keyword
+   * @param {Array} included Match in the specified column
+   * @param {Array} excluded Does not match in the specified column. Priority is higher than included
    */
     search (searchValue, included, excluded) {
       if (!(this.tableData && this.tableData.rows)) return
@@ -1280,7 +1280,7 @@ export default {
       this.$nextTick(this.updatePagination)
     },
     /**
-   * @function 取消搜索过滤
+   * @function Cancel search filter
    */
     clearSearch () {
       if (!(this.tableData && this.tableData.rows)) return
@@ -1292,8 +1292,8 @@ export default {
       this.$nextTick(this.updatePagination)
     },
     /**
-   * @function 获取选中的行数
-   * @param {Boolean} includeWhenHeaderInfirstRow 是否检查第一行表头。默认false
+   * @function Get the number of selected rows
+   * @param {Boolean} includeWhenHeaderInfirstRow Whether to check the header of the first row. Default false
    */
     getCheckedRowNum (includeWhenHeaderInfirstRow = false) {
       if (!this.showCheck) return 0
@@ -1313,10 +1313,10 @@ export default {
       return 0
     },
     /**
-   * @function 获取选中的行（排序前）的原始索引。返回的索引列表与是否排序无关
-   * @param {Boolean} includeWhenHeaderInfirstRow 是否检查第一行表头。默认false
-   * @param {Boolean} excludeFiltered 是否排除被（搜索/列过滤）过滤掉的（已勾选）行。默认false
-   * @param {Boolean} excludeNotInPage 在启用分页情况下，是否排除不在当前页的（已勾选）行。默认false
+   * @function Get the original index of the selected row (before sorting). The returned index list has nothing to do with sorting
+   * @param {Boolean} includeWhenHeaderInfirstRow Whether to check the header of the first row. Default false
+   * @param {Boolean} excludeFiltered Whether to exclude (checked) rows filtered by (Search/Column Filter). Default false
+   * @param {Boolean} excludeNotInPage When paging is enabled, whether to exclude (checked) rows that are not on the current page. Default false
    */
     getCheckedRowIndexs (includeWhenHeaderInfirstRow = false, excludeFiltered = false, excludeNotInPage = false) {
       if (!this.showCheck) return []
@@ -1343,8 +1343,8 @@ export default {
       return []
     },
     /**
-   * @function 获取选中行的数据（2DMatrix）
-   * @param {Boolean} includeWhenHeaderInfirstRow 是否检查第一行表头
+   * @function Get the data of the selected row（2DMatrix）
+   * @param {Boolean} includeWhenHeaderInfirstRow Whether to check the first row header
    */
     getCheckedRowDatas (includeWhenHeaderInfirstRow = false) {
       let indexs = this.getCheckedRowIndexs(includeWhenHeaderInfirstRow)
@@ -1352,8 +1352,8 @@ export default {
       return checkedDatas || []
     },
     /**
-   * @function 获取表格最新数据。 可指定只包含指定行, 不指定则包含全部数据。 行顺序为初始顺序
-   * @param {Array} rowIndexs 指定行。如：[ 0, 1, 2, ... ]
+   * @function Get the latest data in the table. You can specify to include only the specified rows, or include all data if you don't specify them. Row order is initial order
+   * @param {Array} rowIndexs Specify the line. Such as: [0, 1, 2, ...]
    */
     getData (rowIndexs) {
       let matrix = []
@@ -1374,9 +1374,9 @@ export default {
       return matrix
     },
     /**
-   * @function 根据行索引获取指定行的最新数据
-   * @param {Number} rowIndex 行索引
-   * @param {Boolean} isCurrent 索引是否为排序后的索引。默认false，即原始索引
+   * @function Get the latest data of the specified row according to the row index
+   * @param {Number} rowIndex Row index
+   * @param {Boolean} isCurrent Whether the index is a sorted index. The default is false, which is the original index
    */
     getRowData (rowIndex, isCurrent = false) {
       if (this.tableData && unemptyArray(this.tableData.rows)) {
@@ -1391,10 +1391,10 @@ export default {
       return []
     },
     /**
-   * @function 根据行和列索引获取指定Cell单元最新数据
-   * @param {Number} rowIndex 行索引
-   * @param {Number} columnIndex 列索引
-   * @param {Boolean} isCurrent 行索引是否为排序后的索引。默认false，即原始索引
+   * @function Get the latest data of the specified Cell according to the row and column index
+   * @param {Number} rowIndex
+   * @param {Number} columnIndex
+   * @param {Boolean} isCurrent Whether the row index is a sorted index. The default is false, which is the original index
    */
     getCellData (rowIndex, columnIndex, isCurrent = false) {
       if (this.tableData && unemptyArray(this.tableData.rows)) {
@@ -1413,8 +1413,8 @@ export default {
       return ''
     },
     /**
-   * @function 根据tableRow(内部行对象)获取该行的数据。{ key: 'xxx', cells:[ ... ] } ==> [ ... ]
-   * @param {Number} tableRow 内部行对象。{ key: 'xxx', cells:[ ... ] }
+   * @function Get the data of the row according to tableRow (internal row object). { key: 'xxx', cells:[ ... ] } ==> [ ... ]
+   * @param {Number} tableRow Internal row object. { key: 'xxx', cells:[ ... ] }
    */
     getRowDataFromTableRow (tableRow) {
       let rowData = []
@@ -1428,7 +1428,7 @@ export default {
       return rowData
     },
     /**
-   * @function 获取仅包含选中行的数据对象集合，行数据为内部转换后的对象: {Object} tableRow
+   * @function Get a collection of data objects containing only the selected row, the row data is the internally converted object: {Object} tableRow
    */
     getCheckedRows () {
       if (!this.showCheck) return []
@@ -1443,7 +1443,7 @@ export default {
       return []
     },
     /**
-   * @function 是否所有行均为选中
+   * @function Whether all rows are selected
    */
     isAllRowChecked () {
       if (!this.showCheck) return false
@@ -1458,7 +1458,7 @@ export default {
       return false
     },
     /**
-   * @function 设置所有行选中状态
+   * @function Set all rows selected state
    * @param {Boolean} checked true/false
    */
     setAllRowChecked (checked) {
@@ -1469,8 +1469,8 @@ export default {
       }
     },
     /**
-   * @function 设置指定行选中状态
-   * @param {Array} rows 指定的行
+   * @function Set the selected state of the specified row
+   * @param {Array} rows Specified line
    * @param {Boolean} checked true/false
    */
     setRowChecked (rows, checked = true) {
@@ -1499,7 +1499,7 @@ export default {
       }
     },
     /**
-   * @function 当前显示的行数
+   * @function Number of rows currently displayed
    */
     getActivatedRowNum (includeWhenHeaderInfirstRow = false) {
       if (this.tableData && unemptyArray(this.tableData.rows)) {
@@ -1517,7 +1517,7 @@ export default {
       return 0
     },
     /**
-   * @function 列的数量
+   * @function Number of columns
    */
     getColumnNum () {
       if (this.tableData && unemptyArray(this.tableData.rows)) {
@@ -1527,7 +1527,7 @@ export default {
       return 0
     },
     /**
-     * @function 水平方向滚动事件
+     * @function Horizontal scroll event
      */
     onScrollX (pos) {
       if (pos.right) {
@@ -1545,7 +1545,7 @@ export default {
       }
     },
     /**
-     * @function 垂直方向滚动事件
+     * @function Vertical scroll event
      */
     onScrollY (pos) {
       if (pos.top) {
@@ -1562,7 +1562,7 @@ export default {
       this.bodyWidth = size.wrapperWidth
     },
     /**
-     * @function 固定列的鼠标滚动事件
+     * @function Fixed column mouse scroll event
      */
     onFixedScroll (e) {
       if (!(this.fixedWidth > 0)) return
