@@ -81,6 +81,10 @@ const random = (length) => {
   return num.toString(16).slice(0 - length)
 }
 
+function timeout(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 const defaultTableParams = {
   data: [
     [' Index', `Data1`, `Data2`, `Data3`]
@@ -124,7 +128,21 @@ const defaultTableParams = {
   // showTotal: true,
   // pageSize: 20,
   // pageSizes: [5, 15, 30, 50, 100],
-  language: ''
+  language: '',
+
+  // customization
+  remoteDataSource: true,
+  searchHandler: async function(searchValue) {
+    await timeout(2000);
+    return {
+      totalItems: 27,
+      data: [[' Index', `Data1`, `Data2`, `Data3`]].concat(this.params.data.slice(20, 30)),
+    };
+  },
+  pageChangeHandler: async function(page, searchValue) {
+    await timeout(2000);
+    return [[' Index', `Data1`, `Data2`, `Data3`]].concat(this.params.data.slice(30, 40));
+  },
 }
 
 for (let i = 0; i < 200; i++) {

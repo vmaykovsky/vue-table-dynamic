@@ -415,6 +415,7 @@ export default {
       bodyViewerWidth: null,
       hMovement: 0,
       isLoading: false,
+      currentPage: 1,
     }
   },
   props: {
@@ -660,7 +661,28 @@ export default {
         return this.params.language
       }
       return 'en_US'
-    }
+    },
+    remoteDataSource() {
+      if (this.params && this.params.remoteDataSource) {
+        return this.params.remoteDataSource;
+      }
+
+      return false;
+    },
+    searchHandler() {
+      if (this.params && this.params.searchHandler) {
+        return this.params.searchHandler;
+      }
+
+      return null;
+    },
+    pageChangeHandler() {
+      if (this.params && this.params.pageChangeHandler) {
+        return this.params.pageChangeHandler;
+      }
+
+      return null;
+    },
   },
   watch: {
     params: {
@@ -680,8 +702,22 @@ export default {
       immediate: true
     },
     searchValue (value) {
-      if (!this.enableSearch) return
-      this.search(value)
+      if (!this.enableSearch) return;
+      if (this.remoteDataSource && this.searchHandler) {
+        this.isLoading = true;
+        this.searchHandler(value)
+          .then(({ data, totalItems }) => {
+            this.initData(data, totalItems);
+            this.isLoading = false;
+          })
+          .catch(() => {
+            this.isLoading = false;
+          });
+
+        return;
+      }
+
+      this.search(value);
     },
     headerInfirstRow (value) {
       if (value && this.tableData && this.tableData.rows.length) {
@@ -724,7 +760,7 @@ export default {
     /**
    * @function Initialize table data
    */
-    initData (sourceData) {
+    initData (sourceData, totalItems, skipPaginationUpdate) {
       if (this.params && is2DMatrix(sourceData)) {
         let table = { key: unique(`table-`), checked: false, rows: [], activatedRows: [], filteredRows: {} }
         for (let i = 0; i < sourceData.length; i++) {
@@ -737,9 +773,14 @@ export default {
         this.tableData = table
 
         if (this.pagination) {
-          this.$nextTick(this.updatePagination)
+          if (!skipPaginationUpdate) {
+            this.$nextTick(() => this.updatePagination(totalItems));
+          } else if (this.remoteDataSource) {
+            this.tableData.rows.forEach(r => { r.inPage = true; });
+            this.tableData.activatedRows = this.tableData.rows;
+          }
         } else {
-          this.tableData.activatedRows = this.tableData.rows
+          this.tableData.activatedRows = this.tableData.rows;
         }
       }
     },
@@ -754,10 +795,11 @@ export default {
     /**
    * @function Update paging data
    */
-    updatePagination () {
-      if (!this.pagination) return
-      if (!(this.tableData && this.tableData.rows && this.tableData.rows.length > 0)) return
-      const rowNum = this.getActivatedRowNum()
+    updatePagination (totalItems) {
+      if (!this.pagination) return;
+      if (!(this.tableData && this.tableData.rows && this.tableData.rows.length > 0)) return;
+
+      const rowNum = this.remoteDataSource && totalItems !== undefined ? totalItems : this.getActivatedRowNum();
       if (rowNum === this.totalPages) {
         if (this.$refs && this.$refs.tablePagination) {
           this.$refs.tablePagination.initPages(this.totalPages)
@@ -771,20 +813,37 @@ export default {
    * @param {Number} page number
    */
     onPageChange (page) {
-      if (!this.pagination) return
-      if (!(this.tableData && this.tableData.rows && this.tableData.rows.length > 0)) return
-      let start = (page - 1) * this.pageSize
-      let end = start + this.pageSize
+      if (!this.pagination) return;
+      if (!(this.tableData && this.tableData.rows && this.tableData.rows.length > 0)) return;
+
+      if (this.remoteDataSource && this.pageChangeHandler && this.currentPage !== page) {
+        this.isLoading = true;
+        this.pageChangeHandler(page)
+          .then((data) => {
+            this.initData(data, undefined, true);
+            this.isLoading = false;
+          })
+          .catch(() => {
+            this.isLoading = false;
+          });
+
+        this.currentPage = page;
+        return;
+      }
+
+      this.currentPage = page;
+      let start = (page - 1) * this.pageSize;
+      let end = start + this.pageSize;
 
       let rows = this.tableData.rows.filter((row, index) => {
-        if (index === 0 && this.headerInfirstRow) return false
-        return row.show && !row.filtered 
+        if (index === 0 && this.headerInfirstRow) return false;
+        return row.show && !row.filtered;
       })
       rows.forEach((row, index) => {
-        row.inPage = !!(index >= start && index < end)
+        row.inPage = !!(index >= start && index < end);
       })
 
-      this.$nextTick(this.updateActivatedRows)
+      this.$nextTick(this.updateActivatedRows);
     },
     /**
    * @function Display the number of switching events per page
@@ -907,7 +966,7 @@ export default {
       this.fixedColumn.splice(0, this.fixedColumn.length, ...fixedColumn)
     },
     /**
-   * @function 检查Cell是否可编辑
+   * @function Check whether the cell is editable
    * @param {Number} rowIndex
    * @param {Number} columnIndex
    */
