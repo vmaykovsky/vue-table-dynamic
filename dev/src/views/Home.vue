@@ -132,7 +132,7 @@ const defaultTableParams = {
 
   // customization
   remoteDataSource: true,
-  searchHandler: async function(searchValue, pageSize) {
+  searchHandler: async function(searchValue, pageSize, sort) {
     await timeout(1000);
     const result = this.params.data.filter(row => {
       if (JSON.stringify(row) === JSON.stringify(['Index', 'Data1', 'Data2', 'Data3'])) {
@@ -151,7 +151,7 @@ const defaultTableParams = {
       data: [['Index', 'Data1', 'Data2', 'Data3']].concat(result.slice(0, pageSize)),
     };
   },
-  pageChangeHandler: async function(page, pageSize, searchValue) {
+  pageChangeHandler: async function(searchValue, page, pageSize, sort) {
     await timeout(1000);
     const skip = (page - 1) * pageSize;
     const result = this.params.data.filter(row => {
@@ -168,8 +168,32 @@ const defaultTableParams = {
 
     return [['Index', 'Data1', 'Data2', 'Data3']].concat(result);
   },
-  pageSizeChangeHandler: async function(pageSize, searchValue) {
-    return this.searchHandler(searchValue, pageSize);
+  pageSizeChangeHandler: async function(searchValue, pageSize, sort) {
+    console.log(sort);
+    return this.searchHandler(searchValue, pageSize, sort);
+  },
+  sortHandler: async function(searchValue, page, pageSize, sort) {
+    await timeout(1000);
+    const skip = (page - 1) * pageSize;
+    const result = this.params.data.filter(row => {
+      if (JSON.stringify(row) === JSON.stringify(['Index', 'Data1', 'Data2', 'Data3'])) {
+        return false;
+      }
+    
+      if (!searchValue) {
+        return true;
+      }
+
+      return row.some(cell => cell.toString().toLowerCase().includes(searchValue.toLowerCase()));
+    })
+    .sort((a, b) => {
+      if (a[sort.columnIndex] === b[sort.columnIndex]) { return 0; }
+      else if(sort.order === 'ascending') { return a[sort.columnIndex] > b[sort.columnIndex] ? 1 : -1 }
+      else if(sort.order === 'descending') { return b[sort.columnIndex] > a[sort.columnIndex] ? 1 : -1 }
+    })
+    .slice(skip, skip + pageSize);
+
+    return [['Index', 'Data1', 'Data2', 'Data3']].concat(result);
   },
 }
 

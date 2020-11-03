@@ -690,6 +690,13 @@ export default {
 
       return null;
     },
+    sortHandler() {
+      if (this.params && this.params.sortHandler) {
+        return this.params.sortHandler;
+      }
+
+      return null;
+    },
   },
   watch: {
     params: {
@@ -712,7 +719,8 @@ export default {
       if (!this.enableSearch) return;
       if (this.remoteDataSource && this.searchHandler) {
         this.isLoading = true;
-        this.searchHandler(value, this.pageSize)
+
+        this.searchHandler(value, this.pageSize, this.getSort())
           .then(({ data, totalItems }) => {
             this.initData(data, totalItems);
             this.isLoading = false;
@@ -764,6 +772,15 @@ export default {
     this.activatedFilter = {}
   },
   methods: {
+    getSort() {
+      const sort = {};
+      if (Object.keys(this.activatedSort).length) {
+        sort.columnIndex = Object.keys(this.activatedSort)[0];
+        sort.order = this.activatedSort[sort.columnIndex];
+      }
+
+      return sort;
+    },
     /**
    * @function Initialize table data
    */
@@ -825,7 +842,7 @@ export default {
 
       if (this.remoteDataSource && this.pageChangeHandler && this.currentPage !== page) {
         this.isLoading = true;
-        this.pageChangeHandler(page, this.pageSize, this.searchValue)
+        this.pageChangeHandler(this.searchValue, page, this.pageSize, this.getSort())
           .then((data) => {
             this.initData(data, undefined, true);
             this.isLoading = false;
@@ -859,7 +876,7 @@ export default {
       if (!this.pagination) return;
       if (this.pageSize !== size && this.remoteDataSource && this.pageSizeChangeHandler) {
         this.isLoading = true;
-        this.pageSizeChangeHandler(size, this.searchValue)
+        this.pageSizeChangeHandler(this.searchValue, size, this.getSort())
           .then(({ data, totalItems }) => {
             this.initData(data, totalItems);
             this.isLoading = false;
@@ -1222,12 +1239,27 @@ export default {
    * @param {String} value ascending/descending
    */
     onSort (index, value) {
-      if (!(this.tableData && this.tableData.rows && this.tableData.rows.length > 0)) return
-      if (!this.headerInfirstRow) return
-      if (this.activatedSort[index] === value) return
+      if (!(this.tableData && this.tableData.rows && this.tableData.rows.length > 0)) return;
+      if (!this.headerInfirstRow) return;
+      if (this.activatedSort[index] === value) return;
 
-      this.activatedSort = {}
-      this.activatedSort[index] = value
+      this.activatedSort = {};
+      this.activatedSort[index] = value;
+
+      if (this.remoteDataSource && this.sortHandler) {
+        this.isLoading = true;
+        this.sortHandler(this.searchValue, this.currentPage, this.pageSize, { columnIndex: index, order: value })
+          .then(data => {
+            this.initData(data, undefined, true);
+            this.isLoading = false;
+          })
+          .catch(() => {
+            this.isLoading = false;
+          });
+
+        this.$emit('sort-change', index, value);
+        return;
+      }
 
       // Default collation
       let ascending = (a, b) => { 
