@@ -705,7 +705,7 @@ export default {
       if (!this.enableSearch) return;
       if (this.remoteDataSource && this.searchHandler) {
         this.isLoading = true;
-        this.searchHandler(value)
+        this.searchHandler(value, this.pageSize)
           .then(({ data, totalItems }) => {
             this.initData(data, totalItems);
             this.isLoading = false;
@@ -818,7 +818,7 @@ export default {
 
       if (this.remoteDataSource && this.pageChangeHandler && this.currentPage !== page) {
         this.isLoading = true;
-        this.pageChangeHandler(page)
+        this.pageChangeHandler(page, this.pageSize, this.searchValue)
           .then((data) => {
             this.initData(data, undefined, true);
             this.isLoading = false;

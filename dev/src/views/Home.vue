@@ -132,16 +132,31 @@ const defaultTableParams = {
 
   // customization
   remoteDataSource: true,
-  searchHandler: async function(searchValue) {
-    await timeout(2000);
+  searchHandler: async function(searchValue, pageSize) {
+    await timeout(1000);
+    const data = [[' Index', `Data1`, `Data2`, `Data3`]].concat(this.params.data.filter(row => {
+        if (!searchValue) {
+          return true;
+        }
+
+        return row.some(cell => cell.toString().toLowerCase().includes(searchValue.toLowerCase()));
+      }));
+
     return {
-      totalItems: 27,
-      data: [[' Index', `Data1`, `Data2`, `Data3`]].concat(this.params.data.slice(20, 30)),
+      totalItems: data.length,
+      data: data.slice(0, pageSize),
     };
   },
-  pageChangeHandler: async function(page, searchValue) {
-    await timeout(2000);
-    return [[' Index', `Data1`, `Data2`, `Data3`]].concat(this.params.data.slice(30, 40));
+  pageChangeHandler: async function(page, pageSize, searchValue) {
+    await timeout(1000);
+    const skip = (page - 1) * pageSize;
+    return [[' Index', `Data1`, `Data2`, `Data3`]].concat(this.params.data.filter(row => {
+        if (!searchValue) {
+          return true;
+        }
+
+        return row.some(cell => cell.toString().toLowerCase().includes(searchValue.toLowerCase()));
+      }).slice(skip, skip + pageSize));
   },
 }
 
