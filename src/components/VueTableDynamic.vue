@@ -683,6 +683,13 @@ export default {
 
       return null;
     },
+    pageSizeChangeHandler() {
+      if (this.params && this.params.pageSizeChangeHandler) {
+        return this.params.pageSizeChangeHandler;
+      }
+
+      return null;
+    },
   },
   watch: {
     params: {
@@ -849,8 +856,20 @@ export default {
    * @function Display the number of switching events per page
    */
     onPageSizeChange (size) {
-      if (!this.pagination) return
-      this.pageSize = size
+      if (!this.pagination) return;
+      if (this.pageSize !== size && this.remoteDataSource && this.pageSizeChangeHandler) {
+        this.isLoading = true;
+        this.pageSizeChangeHandler(size, this.searchValue)
+          .then(({ data, totalItems }) => {
+            this.initData(data, totalItems);
+            this.isLoading = false;
+          })
+          .catch(() => {
+            this.isLoading = false;
+          });
+      }
+
+      this.pageSize = size;
     },
     /**
    * @function Jump to the target page

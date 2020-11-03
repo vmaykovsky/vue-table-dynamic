@@ -87,7 +87,7 @@ function timeout(ms) {
 
 const defaultTableParams = {
   data: [
-    [' Index', `Data1`, `Data2`, `Data3`]
+    ['Index', 'Data1', 'Data2', 'Data3']
   ],
   header: 'row',
   height: '',
@@ -134,29 +134,42 @@ const defaultTableParams = {
   remoteDataSource: true,
   searchHandler: async function(searchValue, pageSize) {
     await timeout(1000);
-    const data = [[' Index', `Data1`, `Data2`, `Data3`]].concat(this.params.data.filter(row => {
-        if (!searchValue) {
-          return true;
-        }
+    const result = this.params.data.filter(row => {
+      if (JSON.stringify(row) === JSON.stringify(['Index', 'Data1', 'Data2', 'Data3'])) {
+        return false;
+      }
 
-        return row.some(cell => cell.toString().toLowerCase().includes(searchValue.toLowerCase()));
-      }));
+      if (!searchValue) {
+        return true;
+      }
+
+      return row.some(cell => cell.toString().toLowerCase().includes(searchValue.toLowerCase()));
+    });
 
     return {
-      totalItems: data.length,
-      data: data.slice(0, pageSize),
+      totalItems: result.length,
+      data: [['Index', 'Data1', 'Data2', 'Data3']].concat(result.slice(0, pageSize)),
     };
   },
   pageChangeHandler: async function(page, pageSize, searchValue) {
     await timeout(1000);
     const skip = (page - 1) * pageSize;
-    return [[' Index', `Data1`, `Data2`, `Data3`]].concat(this.params.data.filter(row => {
-        if (!searchValue) {
-          return true;
-        }
+    const result = this.params.data.filter(row => {
+      if (JSON.stringify(row) === JSON.stringify(['Index', 'Data1', 'Data2', 'Data3'])) {
+        return false;
+      }
+    
+      if (!searchValue) {
+        return true;
+      }
 
-        return row.some(cell => cell.toString().toLowerCase().includes(searchValue.toLowerCase()));
-      }).slice(skip, skip + pageSize));
+      return row.some(cell => cell.toString().toLowerCase().includes(searchValue.toLowerCase()));
+    }).slice(skip, skip + pageSize);
+
+    return [['Index', 'Data1', 'Data2', 'Data3']].concat(result);
+  },
+  pageSizeChangeHandler: async function(pageSize, searchValue) {
+    return this.searchHandler(searchValue, pageSize);
   },
 }
 
