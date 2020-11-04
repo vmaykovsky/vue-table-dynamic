@@ -88,8 +88,8 @@ function timeout(ms) {
 }
 
 function compare(a, operator, b) {
-  const aa = String(a).toLowerCase();
-  const bb = String(b).toLowerCase();
+  const aa = typeof a === 'number' ? a : String(a).toLowerCase();
+  const bb = typeof b === 'number' ? b : String(b).toLowerCase();
 
   switch(operator) {
     case 'eq':
@@ -134,17 +134,23 @@ function filterRowsBySearch(rows, searchValue) {
 }
 
 function filterRows(rows, filter) {
-  let result = rows;
-  Object.keys(filter).map(key => filter[key]).forEach(f => {
-    // apply only checked filter values
-    f.content.filter(i => i.checked).forEach(i => {
-      result = result.filter(row => {
-        return compare(row[f.column], f.operator, i.value);
-      });
+  let result = rows.map((r, ix) => ({ _rid: ix, row: r }));
+  Object.keys(filter).map(key => filter[key]).forEach((f, ix) => {
+    let accumulated = [];
+    const checked = f.content.filter(i => i.checked);
+    if (!checked.length) {
+      return;
+    }
+
+    checked.forEach(i => {
+      accumulated = accumulated.concat(result.filter(r => (compare(r.row[f.column], f.operator, i.value))));
     });
+
+    const uniqueRid = [...new Set(accumulated.map(i => i._rid))];
+    result = uniqueRid.map(i => accumulated.find(k => k._rid === i));
   });
 
-  return result;
+  return result.map(i => i.row);
 }
 
 function sortRows(rows, sort) {
@@ -205,7 +211,7 @@ const defaultTableParams = {
   filter: [{
     column: 0,
     operator: 'gt',
-    content: [{text: '> 3', value: 3}, {text: '> 5', value: 5}, {text: '> 7', value: 7}], 
+    content: [{text: '> 20', value: 20}, {text: '> 50', value: 50}, {text: '> 100', value: 100}], 
     method: (value, tableCell) => { return tableCell.data > value }
   }, {
     column: 2,

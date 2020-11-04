@@ -1289,7 +1289,6 @@ export default {
 
       if (this.remoteDataSource && this.remoteDataHandler) {
         this.isLoading = true;
-        console.log(this.filterConfig);
         this.remoteDataHandler(this.searchValue, this.filterConfig, this.getSort(), 1, this.pageSize)
           .then(({ data, totalItems }) => {
             this.initData(data, totalItems);
@@ -1335,24 +1334,30 @@ export default {
    */
     clearFilter (columnIndex) {
       if (typeof columnIndex === 'number') {
-        this.activatedFilter[columnIndex] = false
-        delete this.tableData.filteredRows[columnIndex]
+        this.activatedFilter[columnIndex] = false;
+
+        if (!(this.remoteDataSource && this.remoteDataHandler)) {
+          delete this.tableData.filteredRows[columnIndex];
+        }
 
         if (this.filterConfig && this.filterConfig[columnIndex]) {
-          this.filterConfig[columnIndex].content.forEach(c => { c.checked = false })
+          this.filterConfig[columnIndex].content.forEach(c => { c.checked = false });
         }
       } else {
-        this.activatedFilter = {}
-        this.tableData.filteredRows = {}
+        this.activatedFilter = {};
+
+        if (!(this.remoteDataSource && this.remoteDataHandler)) {
+          this.tableData.filteredRows = {};
+        }
 
         Object.keys(this.filterConfig).forEach(key => {
-          this.filterConfig[key].content.forEach(c => { c.checked = false })
+          this.filterConfig[key].content.forEach(c => { c.checked = false });
         })
       }
 
       if (this.remoteDataSource && this.remoteDataHandler) {
         this.isLoading = true;
-        this.remoteDataHandler(this.searchValue, this.pageSize, this.getSort(), this.filterConfig)
+        this.remoteDataHandler(this.searchValue, this.filterConfig, this.getSort(), 1, this.pageSize)
           .then(({ data, totalItems }) => {
             this.initData(data, totalItems);
             this.isLoading = false;
@@ -1364,7 +1369,7 @@ export default {
         return;
       }
   
-      this.updateFilteredRows()
+      this.updateFilteredRows();
     },
     /**
    * @function Search by keyword, show matching rows
