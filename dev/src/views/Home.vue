@@ -87,6 +87,94 @@ function timeout(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+function compare(a, operator, b) {
+  const aa = String(a).toLowerCase();
+  const bb = String(b).toLowerCase();
+
+  switch(operator) {
+    case 'eq':
+      return aa === bb;
+    case 'ne':
+      return aa !== bb;
+    case 'gt':
+      return aa > bb;
+    case 'gte':
+      return aa >= bb;
+    case 'lt':
+      return aa < bb;
+    case 'lte':
+      return aa <= bb;
+    case 'sw':
+      return aa.startsWith(bb);
+    case 'ew':
+      return aa.endsWith(bb);
+    default:
+      return false;
+  }
+}
+
+function removeHeader(rows) {
+  return rows.filter(row => {
+    if (JSON.stringify(row) === JSON.stringify(['Index', 'Data1', 'Data2', 'Data3'])) {
+      return false;
+    }
+
+    return true;
+  });
+}
+
+function filterRowsBySearch(rows, searchValue) {
+  if (!searchValue || !searchValue.trim()) {
+    return rows;
+  }
+
+  return rows.filter(row => {
+    return row.some(cell => String(cell).toLowerCase().includes(searchValue.toLowerCase()));
+  });
+}
+
+function filterRows(rows, filter) {
+  let result = rows;
+  Object.keys(filter).map(key => filter[key]).forEach(f => {
+    // apply only checked filter values
+    f.content.filter(i => i.checked).forEach(i => {
+      result = result.filter(row => {
+        return compare(row[f.column], f.operator, i.value);
+      });
+    });
+  });
+
+  return result;
+}
+
+function sortRows(rows, sort) {
+  return rows.sort((a, b) => {
+    if (a[sort.columnIndex] === b[sort.columnIndex]) { return 0; }
+    else if(sort.order === 'ascending') { return a[sort.columnIndex] > b[sort.columnIndex] ? 1 : -1 }
+    else if(sort.order === 'descending') { return b[sort.columnIndex] > a[sort.columnIndex] ? 1 : -1 }
+  });
+}
+
+function paginateRows(rows, page, pageSize) {
+  const skip = (page - 1) * pageSize;
+  return rows.slice(skip, skip + pageSize);
+}
+
+async function emulateRemoteData(rows, searchValue, filter, sort, page, pageSize) {
+  await timeout(1000);
+  let result = removeHeader(rows);
+  result = filterRowsBySearch(result, searchValue);
+  result = filterRows(result, filter);
+  result = sortRows(result, sort);
+  const totalItems = result.length;
+  result = paginateRows(result, page, pageSize);
+
+  return {
+    totalItems,
+    data: [['Index', 'Data1', 'Data2', 'Data3']].concat(result),
+  };
+}
+
 const defaultTableParams = {
   data: [
     ['Index', 'Data1', 'Data2', 'Data3']
@@ -115,13 +203,15 @@ const defaultTableParams = {
   edit: {},
   highlight: {},
   filter: [{
-    column: 0, 
+    column: 0,
+    operator: 'gt',
     content: [{text: '> 3', value: 3}, {text: '> 5', value: 5}, {text: '> 7', value: 7}], 
     method: (value, tableCell) => { return tableCell.data > value }
   }, {
-    column: 2, 
-    content: [{text: '1-Cell', value: '1-Cell'}, {text: '2-Cell', value: '2-Cell'}, {text: '3-Cell', value: '3-Cell'}], 
-    method: (value, tableCell) => { return String(tableCell.data).toLocaleLowerCase().includes(String(value).toLocaleLowerCase()) }
+    column: 2,
+    operator: 'ew',
+    content: [{text: '*1-Cell', value: '1-Cell'}, {text: '*2-Cell', value: '2-Cell'}, {text: '*3-Cell', value: '3-Cell'}], 
+    method: (value, tableCell) => { return String(tableCell.data).toLocaleLowerCase().endsWith(String(value).toLocaleLowerCase()) }
   }],
   // style: {
   //   row: [{ scope: [0], styles: { color: '#046FDB'}}]
@@ -133,68 +223,9 @@ const defaultTableParams = {
   language: '',
 
   // remote data handlers
-  searchHandler: async function(searchValue, pageSize, sort) {
-    await timeout(1000);
-    const result = this.params.data.filter(row => {
-      if (JSON.stringify(row) === JSON.stringify(['Index', 'Data1', 'Data2', 'Data3'])) {
-        return false;
-      }
-
-      if (!searchValue) {
-        return true;
-      }
-
-      return row.some(cell => cell.toString().toLowerCase().includes(searchValue.toLowerCase()));
-    });
-
-    return {
-      totalItems: result.length,
-      data: [['Index', 'Data1', 'Data2', 'Data3']].concat(result.slice(0, pageSize)),
-    };
-  },
-  pageChangeHandler: async function(searchValue, page, pageSize, sort) {
-    await timeout(1000);
-    const skip = (page - 1) * pageSize;
-    const result = this.params.data.filter(row => {
-      if (JSON.stringify(row) === JSON.stringify(['Index', 'Data1', 'Data2', 'Data3'])) {
-        return false;
-      }
-    
-      if (!searchValue) {
-        return true;
-      }
-
-      return row.some(cell => cell.toString().toLowerCase().includes(searchValue.toLowerCase()));
-    }).slice(skip, skip + pageSize);
-
-    return [['Index', 'Data1', 'Data2', 'Data3']].concat(result);
-  },
-  pageSizeChangeHandler: async function(searchValue, pageSize, sort) {
-    console.log(sort);
-    return this.searchHandler(searchValue, pageSize, sort);
-  },
-  sortHandler: async function(searchValue, page, pageSize, sort) {
-    await timeout(1000);
-    const skip = (page - 1) * pageSize;
-    const result = this.params.data.filter(row => {
-      if (JSON.stringify(row) === JSON.stringify(['Index', 'Data1', 'Data2', 'Data3'])) {
-        return false;
-      }
-    
-      if (!searchValue) {
-        return true;
-      }
-
-      return row.some(cell => cell.toString().toLowerCase().includes(searchValue.toLowerCase()));
-    })
-    .sort((a, b) => {
-      if (a[sort.columnIndex] === b[sort.columnIndex]) { return 0; }
-      else if(sort.order === 'ascending') { return a[sort.columnIndex] > b[sort.columnIndex] ? 1 : -1 }
-      else if(sort.order === 'descending') { return b[sort.columnIndex] > a[sort.columnIndex] ? 1 : -1 }
-    })
-    .slice(skip, skip + pageSize);
-
-    return [['Index', 'Data1', 'Data2', 'Data3']].concat(result);
+  remoteDataSource: true,
+  remoteDataHandler: async function(searchValue, filter, sort, page, pageSize) {
+    return emulateRemoteData(this.params.data, searchValue, filter, sort, page, pageSize);
   },
 }
 

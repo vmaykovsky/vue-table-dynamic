@@ -360,7 +360,8 @@ Filter rows based on specified column data and rule
 - `filter:`*`Array<{column:number; content:Array<{text:string; value:string|number;}>; method:function;}>`* specify filterable columns and rules. such as: *`[{column: 0, content: [{text: '> 2', value: 2}], method: (value, cell) => { return cell.data > value }}]`*
 - `filter[].column:` column index
 - `filter[].content:` filter items
-- `filter[].method:` filter rule.     
+- `filter[].method:` filter rule (applicable only for client-side filtering).  
+- `filter[].operator:` filter operator (applicable only for server-side filtering): eq/ne/gt/gte/lt/lte/sw/ew.  
 
 ![filter](./docs/images/filter.png) 
 
@@ -409,6 +410,18 @@ export default {
 }
 </script>
 ```
+
+The `filter[].operator` values:
+| name | description |
+| -----| ----------- |
+| `eq`   | Matches values that are equal to a specified value. |
+| `ne`   | Matches all values that are not equal to a specified value. |
+| `gt`   | Matches values that are greater than a specified value. |
+| `gte`   | Matches values that are greater than or equal to a specified value. |
+| `lt`   | Matches values that are less than a specified value. |
+| `lte`   | Matches values that are less than or equal to a specified value. |
+| `sw`   | Matches all values that start with a specified value. |
+| `ew`   | Matches all values that end with a specified value. |
 
 ### Pagination
 
@@ -798,7 +811,7 @@ export default {
 ### Remote Data source
 
 Use this feature if you work with large amount of data and want to load them remotely.  
-You have to setup `remoteDataSource` param and specify handlers. All of handlers must be specified otherwise you may get an unexpected behaviour. 
+You have to setup `remoteDataSource` param to `true` and specify `remoteDataHandler` handler.
 
 ```
 <template>
@@ -821,10 +834,13 @@ export default {
           ['Cell-7', 'Cell-8', 'Cell-9']
         ],
         remoteDataSource: true,
-        searchHandler: async function(searchValue, pageSize, sort) { ... },
-        pageChangeHandler: async function(searchValue, page, pageSize, sort) { ... },
-        pageSizeChangeHandler: async function(searchValue, pageSize, sort) { ... },
-        sortHandler: async function(searchValue, page, pageSize, sort) { ... },
+        remoteDataHandler: async function(searchValue, filter, sort, page, pageSize) {
+          ...
+          return {
+            totalItems,    // total amount of rows in table
+            data,          // rows array for the current page (has the same structure as `data` when table initialization)
+          };
+        },
       }
     }
   },
@@ -834,26 +850,23 @@ export default {
 </script>
 ```
 
-Handlers params:  
+Handler params:  
 
 | name | description | type | default value |
 | -----| ----------- | ---- | ------------- |
 | `searchValue`   | Search value in search field | `string` | `''` |
+| `filter`   | Columns filters state | `object` | `{}` |
+| `sort`   | Sorting data | `{ columnIndex: number, sort: 'ascending'\'descending' }` | `{}` |
 | `page`   | Current page number | `number` | `1` |
 | `pageSize`   | Page size | `number` | - |
-| `sort`   | Sorting data | `{ columnIndex: number, sort: 'ascending'\'descending' }` | `{}` |
 
 
-Handlers return data:
-
-| name | description | return type |
-| -----| ----------- | ----------- |
-| `searchHandler`   | Fires when user types in search field | `{ totalItems: number,  data: Array<[any, ..., any]> }`. The `totalItems` is total amount of rows in table. `data` is rows array for the current page. |
-| `pageChangeHandler`   | Fires when user navigates to a page | `Array<[any, ..., any]>`. Rows array for the current page. |
-| `pageSizeChangeHandler`   | Fires when user changes page size | `Array<[any, ..., any]>`. Rows array for the current page. |
-| `sortHandler`   | Fires when user changes sorting | `Array<[any, ..., any]>`. Rows array for the current page. |
-
-**Note**: in all cases `Array<[any, ..., any]>` is the same as `data` when data table initialization and it must include table header if configuration is `header: row`.
+The `filter` param structure (read more in [Filter](#filter) section):  
+- `filter:`*`Array<{column:number; content:Array<{text:string; value:string|number;}>; method:function;}>`* specify filterable columns and rules. such as: *`[{column: 0, content: [{text: '> 2', value: 2}], method: (value, cell) => { return cell.data > value }}, operator: 'gte' ]`*
+- `filter[].column:` column index
+- `filter[].content:` filter items
+- `filter[].method:` filter rule (applicable only for client-side filtering).  
+- `filter[].operator:` filter operator (applicable only for server-side filtering): eq/ne/gt/gte/lt/lte/sw/ew. 
 
 
 ## API

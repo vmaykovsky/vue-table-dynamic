@@ -669,30 +669,9 @@ export default {
 
       return false;
     },
-    searchHandler() {
-      if (this.params && this.params.searchHandler) {
-        return this.params.searchHandler;
-      }
-
-      return null;
-    },
-    pageChangeHandler() {
-      if (this.params && this.params.pageChangeHandler) {
-        return this.params.pageChangeHandler;
-      }
-
-      return null;
-    },
-    pageSizeChangeHandler() {
-      if (this.params && this.params.pageSizeChangeHandler) {
-        return this.params.pageSizeChangeHandler;
-      }
-
-      return null;
-    },
-    sortHandler() {
-      if (this.params && this.params.sortHandler) {
-        return this.params.sortHandler;
+    remoteDataHandler() {
+      if (this.params && this.params.remoteDataHandler) {
+        return this.params.remoteDataHandler;
       }
 
       return null;
@@ -717,10 +696,10 @@ export default {
     },
     searchValue (value) {
       if (!this.enableSearch) return;
-      if (this.remoteDataSource && this.searchHandler) {
+      if (this.remoteDataSource && this.remoteDataHandler) {
         this.isLoading = true;
 
-        this.searchHandler(value, this.pageSize, this.getSort())
+        this.remoteDataHandler(value, this.filterConfig, this.getSort(), 1, this.pageSize)
           .then(({ data, totalItems }) => {
             this.initData(data, totalItems);
             this.isLoading = false;
@@ -786,15 +765,15 @@ export default {
    */
     initData (sourceData, totalItems, skipPaginationUpdate) {
       if (this.params && is2DMatrix(sourceData)) {
-        let table = { key: unique(`table-`), checked: false, rows: [], activatedRows: [], filteredRows: {} }
+        let table = { key: unique(`table-`), checked: false, rows: [], activatedRows: [], filteredRows: {} };
         for (let i = 0; i < sourceData.length; i++) {
-          let tableRow = { key: unique(`table-`), checked: false, show: true, filtered: false, inPage: false, hovering: false, index: i }
+          let tableRow = { key: unique(`table-`), checked: false, show: true, filtered: false, inPage: false, hovering: false, index: i };
           tableRow.cells = sourceData[i].map(item => {
-            return { data: item, key: unique(`table-`), checked: false }
+            return { data: item, key: unique(`table-`), checked: false };
           })
-          table.rows.push(tableRow)
+          table.rows.push(tableRow);
         }
-        this.tableData = table
+        this.tableData = table;
 
         if (this.pagination) {
           if (!skipPaginationUpdate) {
@@ -840,10 +819,10 @@ export default {
       if (!this.pagination) return;
       if (!(this.tableData && this.tableData.rows && this.tableData.rows.length > 0)) return;
 
-      if (this.remoteDataSource && this.pageChangeHandler && this.currentPage !== page) {
+      if (this.remoteDataSource && this.remoteDataHandler && this.currentPage !== page) {
         this.isLoading = true;
-        this.pageChangeHandler(this.searchValue, page, this.pageSize, this.getSort())
-          .then((data) => {
+        this.remoteDataHandler(this.searchValue, this.filterConfig, this.getSort(), page, this.pageSize)
+          .then(({ data }) => {
             this.initData(data, undefined, true);
             this.isLoading = false;
           })
@@ -874,9 +853,9 @@ export default {
    */
     onPageSizeChange (size) {
       if (!this.pagination) return;
-      if (this.pageSize !== size && this.remoteDataSource && this.pageSizeChangeHandler) {
+      if (this.pageSize !== size && this.remoteDataSource && this.remoteDataHandler) {
         this.isLoading = true;
-        this.pageSizeChangeHandler(this.searchValue, size, this.getSort())
+        this.remoteDataHandler(this.searchValue, this.filterConfig, this.getSort(), 1, size)
           .then(({ data, totalItems }) => {
             this.initData(data, totalItems);
             this.isLoading = false;
@@ -1246,10 +1225,10 @@ export default {
       this.activatedSort = {};
       this.activatedSort[index] = value;
 
-      if (this.remoteDataSource && this.sortHandler) {
+      if (this.remoteDataSource && this.remoteDataHandler) {
         this.isLoading = true;
-        this.sortHandler(this.searchValue, this.currentPage, this.pageSize, { columnIndex: index, order: value })
-          .then(data => {
+        this.remoteDataHandler(this.searchValue, this.filterConfig, { columnIndex: index, order: value }, this.currentPage, this.pageSize)
+          .then(({ data }) => {
             this.initData(data, undefined, true);
             this.isLoading = false;
           })
@@ -1304,22 +1283,37 @@ export default {
    * @param {Object} config Filter configuration for this column
    */
     onFilter (columnIndex, checked, config) {
-      if (!(this.tableData && this.tableData.rows)) return
+      if (!(this.tableData && this.tableData.rows)) return;
 
-      this.activatedFilter[columnIndex] = true
+      this.activatedFilter[columnIndex] = true;
 
-      let filteredArr = []
+      if (this.remoteDataSource && this.remoteDataHandler) {
+        this.isLoading = true;
+        console.log(this.filterConfig);
+        this.remoteDataHandler(this.searchValue, this.filterConfig, this.getSort(), 1, this.pageSize)
+          .then(({ data, totalItems }) => {
+            this.initData(data, totalItems);
+            this.isLoading = false;
+          })
+          .catch(() => {
+            this.isLoading = false;
+          });
+
+        return;
+      }
+
+      let filteredArr = [];
       this.tableData.rows.forEach((row) => {
         if (row && row.cells && row.cells[columnIndex]) {
           let matched = checked.some(item => {
-            return config.method(item.value, row.cells[columnIndex])
-          })
-          matched ? '' : filteredArr.push(row.index)
+            return config.method(item.value, row.cells[columnIndex]);
+          });
+          matched ? '' : filteredArr.push(row.index);
         }
       })
-      this.tableData.filteredRows[columnIndex] = filteredArr
+      this.tableData.filteredRows[columnIndex] = filteredArr;
 
-      this.updateFilteredRows()
+      this.updateFilteredRows();
     },
     /**
    * @function Update row filter status
@@ -1354,6 +1348,20 @@ export default {
         Object.keys(this.filterConfig).forEach(key => {
           this.filterConfig[key].content.forEach(c => { c.checked = false })
         })
+      }
+
+      if (this.remoteDataSource && this.remoteDataHandler) {
+        this.isLoading = true;
+        this.remoteDataHandler(this.searchValue, this.pageSize, this.getSort(), this.filterConfig)
+          .then(({ data, totalItems }) => {
+            this.initData(data, totalItems);
+            this.isLoading = false;
+          })
+          .catch(() => {
+            this.isLoading = false;
+          });
+
+        return;
       }
   
       this.updateFilteredRows()
