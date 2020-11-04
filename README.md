@@ -19,6 +19,7 @@ English | [简体中文](./README.zh-CN.md)
 - Fixed Header
 - Fixed Columns
 - Slot
+- **Remote Data** source
 
 ## Demo
 [https://theoxiong.github.io/vue-table-dynamic/](https://theoxiong.github.io/vue-table-dynamic/) 
@@ -759,8 +760,8 @@ export default {
 
 ### Slot
 
-Customize cell content by slot
-The slot name should be `column-n`， `n` is the index of column 
+Customize cell content by slot  
+The slot name should be `column-n`， `n` is the index of column.
 
 ```
 <template>
@@ -794,6 +795,57 @@ export default {
 
 </script>
 ```
+
+
+### Remote Data source
+
+Use this feature if you work with large amount of data and want to load them remotely.  
+You have to setup `remoteDataSource` param and specify handlers. All of handlers must be specified otherwise you may get an unexpected behaviour. 
+
+```
+<template>
+  <div style="width: 600px">
+    <vue-table-dynamic :params="params" ref="table"></vue-table-dynamic>
+  </div>
+</template>
+
+<script>
+import VueTableDynamic from 'vue-table-dynamic'
+
+export default {
+  name: 'Demo',
+  data() {
+    return {
+      params: {
+        data: [
+          ['Cell-1', 'Cell-2', 'Cell-3'],
+          ['Cell-4', 'Cell-5', 'Cell-6'],
+          ['Cell-7', 'Cell-8', 'Cell-9']
+        ],
+        remoteDataSource: true,
+        searchHandler: async function(searchValue, pageSize, sort) { ... },
+        pageChangeHandler: async function(searchValue, page, pageSize, sort) { ... },
+        pageSizeChangeHandler: async function(searchValue, pageSize, sort) { ... },
+        sortHandler: async function(searchValue, page, pageSize, sort) { ... },
+      }
+    }
+  },
+  components: { VueTableDynamic }
+}
+
+</script>
+```
+
+Handlers params:  
+
+| name | description | type | default value |
+| -----| ----------- | ---- | ------------- |
+| `searchValue`   | Search value in search field | `string` | `''` |
+| `page`   | Page number | `number` | `1` |
+| `pageSize`   | Page size | `number` | - |
+| `sort`   | Sorting data | `{ columnIndex: number, sort: 'ascending' | 'descending' }` | `{}` |
+
+
 
 ## API
 
