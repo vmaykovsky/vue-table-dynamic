@@ -1,6 +1,6 @@
 {
-  "name": "vue-table-dynamic",
-  "version": "0.3.3",
+  "name": "vue-table-dynamic-remote",
+  "version": "0.4.0",
   "description": "A vue component of dynamic table",
   "main": "dist/index.min.js",
   "scripts": {
@@ -10,7 +10,7 @@
     "build:server": "webpack -p --hide-modules --config ./build/webpack.server.conf.js",
     "server": "node dev/server/server.js"
   },
-  "author": "TheoXiong",
+  "author": "vmaykovsky",
   "license": "MIT",
   "dependencies": {
     "lodash.throttle": "^4.1.1",
@@ -66,14 +66,15 @@
     "table",
     "dynamic",
     "data",
-    "vue"
+    "vue",
+    "remote"
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/TheoXiong/vue-table-dynamic.git"
+    "url": "git+https://github.com/vmaykovsky/vue-table-dynamic.git"
   },
   "bugs": {
-    "url": "https://github.com/TheoXiong/vue-table-dynamic/issues"
+    "url": "https://github.com/vmaykovsky/vue-table-dynamic/issues"
   },
-  "homepage": "https://github.com/TheoXiong/vue-table-dynamic#readme"
+  "homepage": "https://github.com/vmaykovsky/vue-table-dynamic#readme"
 }

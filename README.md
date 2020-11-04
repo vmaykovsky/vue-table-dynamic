@@ -1,7 +1,5 @@
 # vue-table-dynamic
 
-English | [简体中文](./README.zh-CN.md)
-
 [vue-table-dynamic](https://github.com/TheoXiong/vue-table-dynamic) is a vue component of dynamic table. It's designed to respond to data changes in real time, and oriented to the runtime.    
 
 ## Features
@@ -22,13 +20,13 @@ English | [简体中文](./README.zh-CN.md)
 - [**Remote Data** source](#remote-data-source)
 
 ## Demo
-[https://theoxiong.github.io/vue-table-dynamic/](https://theoxiong.github.io/vue-table-dynamic/) 
+[https://vmaykovsky.github.io/vue-table-dynamic/](https://vmaykovsky.github.io/vue-table-dynamic/) 
 
 ![Demo](./demo.png)
 
 ## Install
 ``` 
-$   npm install vue-table-dynamic --save
+$   npm install vue-table-dynamic-remote --save
 ```
 
 ## Usage
