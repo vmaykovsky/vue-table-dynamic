@@ -621,7 +621,7 @@ export default {
       if (this.params && unemptyArray(this.params.filter)) {
         let filterObj = {}
         this.params.filter.forEach(f => {
-          if (f && typeof f.column === 'number' && f.column >= 0 && typeof f.method === 'function' && unemptyArray(f.content)) {
+          if (f && typeof f.column === 'number' && f.column >= 0 && typeof ((f.method === 'function' && !this.remoteDataSource) || (f.operator && this.remoteDataSource)) && unemptyArray(f.content)) {
             if (f.content.every(c => { return (c && typeof c.text === 'string' && typeof c.value !== 'undefined') })) {
               let content = f.content.map(c => { return { ...c, checked: false, key: unique(`content-`) } })
               filterObj[f.column] = { ...f, content, key: unique(`filter-`) }
