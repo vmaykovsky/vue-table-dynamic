@@ -1,6 +1,6 @@
 # vue-table-dynamic-remote
 
-[vue-table-dynamic-remote](https://github.com/vmaykovsky/vue-table-dynamic-remote) is a vue component of dynamic table. It's designed to respond to data changes in real time, and oriented to the runtime.    
+[vue-table-dynamic-remote](https://github.com/vmaykovsky/vue-table-dynamic-remote) (fork of [vue-table-dynamic](https://github.com/TheoXiong/vue-table-dynamic)) is a vue component of dynamic table. It's designed to respond to data changes in real time, and oriented to the runtime. **Supports remote data source.**   
 
 ## Features
 - [Multiple Select](#multiple-select)
