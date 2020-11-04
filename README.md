@@ -849,7 +849,7 @@ Handlers params:
 Handlers return data:
 
 | name | description | return type |
-| -----| ----------- | ---- | ------------- |
+| -----| ----------- | ----------- |
 | `searchHandler`   | Fires when user types in search field | `{ totalItems: number,  data: Array<[any, ..., any]> }`. The `totalItems` is total amount of rows in table. `data` is rows array for the current page. |
 | `pageChangeHandler`   | Fires when user navigates to a page | `Array<[any, ..., any]>`. Rows array for the current page. |
 | `pageSizeChangeHandler`   | Fires when user changes page size | `Array<[any, ..., any]>`. Rows array for the current page. |
