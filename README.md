@@ -5,21 +5,21 @@ English | [简体中文](./README.zh-CN.md)
 [vue-table-dynamic](https://github.com/TheoXiong/vue-table-dynamic) is a vue component of dynamic table. It's designed to respond to data changes in real time, and oriented to the runtime.    
 
 ## Features
-- Multiple Select
-- Search
-- Sort
-- Filter
-- Pagination
-- Edit
-- Border
-- Stripe
-- Highlight
-- Column Width
-- Configure Header
-- Fixed Header
-- Fixed Columns
-- Slot
-- **Remote Data** source
+- [Multiple Select](#multiple-select)
+- [Search](#search)
+- [Sort](#sort)
+- [Filter](#filter)
+- [Pagination](#pagination)
+- [Edit](#edit)
+- [Border](#border)
+- [Stripe](#stripe)
+- [Highlight](#highlight)
+- [Column Width](#column-width)
+- [Configure Header](#header-configure)
+- [Fixed Header](#fixed-header)
+- [Fixed Columns](#fixed-columns)
+- [Slot](#slot)
+- [**Remote Data** source](#remote-data-source)
 
 ## Demo
 [https://theoxiong.github.io/vue-table-dynamic/](https://theoxiong.github.io/vue-table-dynamic/) 
@@ -845,6 +845,17 @@ Handlers params:
 | `pageSize`   | Page size | `number` | - |
 | `sort`   | Sorting data | `{ columnIndex: number, sort: 'ascending'\'descending' }` | `{}` |
 
+
+Handlers return data:
+
+| name | description | return type |
+| -----| ----------- | ---- | ------------- |
+| `searchHandler`   | Fires when user types in search field | `{ totalItems: number,  data: Array<[any, ..., any]> }`. The `totalItems` is total amount of rows in table. `data` is rows array for the current page. |
+| `pageChangeHandler`   | Fires when user navigates to a page | `Array<[any, ..., any]>`. Rows array for the current page. |
+| `pageSizeChangeHandler`   | Fires when user changes page size | `Array<[any, ..., any]>`. Rows array for the current page. |
+| `sortHandler`   | Fires when user changes sorting | `Array<[any, ..., any]>`. Rows array for the current page. |
+
+**Note**: in all cases `Array<[any, ..., any]>` is the same as `data` when data table initialization and it must include table header if configuration is `header: row`.
 
 
 ## API
