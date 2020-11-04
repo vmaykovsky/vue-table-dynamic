@@ -841,9 +841,9 @@ Handlers params:
 | name | description | type | default value |
 | -----| ----------- | ---- | ------------- |
 | `searchValue`   | Search value in search field | `string` | `''` |
-| `page`   | Page number | `number` | `1` |
+| `page`   | Current page number | `number` | `1` |
 | `pageSize`   | Page size | `number` | - |
-| `sort`   | Sorting data | `{ columnIndex: number, sort: 'ascending' | 'descending' }` | `{}` |
+| `sort`   | Sorting data | `{ columnIndex: number, sort: 'ascending'\'descending' }` | `{}` |
 
 
 
