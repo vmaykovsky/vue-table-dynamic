@@ -71,10 +71,13 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vmaykovsky/vue-table-dynamic.git"
+    "url": "git+https://github.com/vmaykovsky/vue-table-dynamic-remote.git"
   },
   "bugs": {
-    "url": "https://github.com/vmaykovsky/vue-table-dynamic/issues"
+    "url": "https://github.com/vmaykovsky/vue-table-dynamic-remote/issues"
   },
-  "homepage": "https://github.com/vmaykovsky/vue-table-dynamic#readme"
+  "homepage": "https://github.com/vmaykovsky/vue-table-dynamic-remote#readme",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  }
 }

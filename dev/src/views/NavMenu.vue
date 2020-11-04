@@ -34,7 +34,7 @@ export default {
   methods: {
     onClick (item) {
       if (item.key === 'github') {
-        window.open('https://github.com/TheoXiong/vue-table-dynamic', '_blank')
+        window.open('https://github.com/vmaykovsky/vue-table-dynamic-remote', '_blank')
       }
     }
   }
