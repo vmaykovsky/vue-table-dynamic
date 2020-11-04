@@ -5,6 +5,9 @@
     </header>
     <aside>
       <vuescroll :ops="scrollBarOpts" ref="vuescroll">
+        <vue-button class="aside-btns" size="mini" @click="getToggleLoader">Toggle Loader</vue-button>
+        <vue-button class="aside-btns" size="mini" @click="getToggleRemoteData">Toggle Remote Data</vue-button>
+        <div class="aside-line"></div>
         <vue-button class="aside-btns" size="mini" @click="addRow">Add Row</vue-button>
         <vue-button class="aside-btns" size="mini" @click="deleteRow">Delete Row</vue-button>
         <vue-button class="aside-btns" size="mini" @click="addColumn">Add Column</vue-button>
@@ -33,7 +36,6 @@
         <div class="aside-line"></div>
         <vue-button class="aside-btns" size="mini" @click="getData">Get Data</vue-button>
         <vue-button class="aside-btns" size="mini" @click="getCheckedRowDatas">Checked Row Data</vue-button>
-        <vue-button class="aside-btns" size="mini" @click="getToggleLoader">Toggle Loader</vue-button>
       </vuescroll>
     </aside>
     <section>
@@ -130,8 +132,7 @@ const defaultTableParams = {
   // pageSizes: [5, 15, 30, 50, 100],
   language: '',
 
-  // customization
-  remoteDataSource: true,
+  // remote data handlers
   searchHandler: async function(searchValue, pageSize, sort) {
     await timeout(1000);
     const result = this.params.data.filter(row => {
@@ -402,6 +403,11 @@ export default {
       if (this.$refs && this.$refs.table) {
         this.$refs.table.isLoading = !this.$refs.table.isLoading;
       }
+    },
+    getToggleRemoteData() {
+      const remoteData = this.params.remoteDataSource || false;
+      this.reset();
+      this.params.remoteDataSource = !remoteData;
     },
     reset () {
       this.params = cloneDeep(defaultTableParams)
