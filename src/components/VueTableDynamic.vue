@@ -110,6 +110,8 @@
                 </span>
               </span>
             </div>
+            <div class="flex-c-c row-actions">
+            </div>
           </div>
         </div>
         <!-- Table Body -->
@@ -181,9 +183,18 @@
                     </span>
                   </slot>
                 </div>
+                <div v-if="rowContextMenu && rowContextMenu.length && rowContextMenu.length > i - (headerInfirstRow ? 1 : 0)" class="flex-c-c row-actions">
+                  <context-menu 
+                    :content="rowContextMenu[i - (headerInfirstRow ? 1 : 0)]"
+                    @select="(value) => onRowContextMenuAction(tableRow, i - (headerInfirstRow ? 1 : 0), value)"
+                  >
+                    <i slot="reference" class="more-dots"></i>
+                  </context-menu>
+                </div>
               </div>
             </div>
           </vue-scrollbar>
+          <div v-if="isLoading" class="v-table-overlay"></div>
         </div>
         <!-- Table Fixed -->
         <div class="v-table-fixed" :class="{ 'is-show-shadow': (scrollx !== 'left' )}"
@@ -384,6 +395,7 @@ import VueScrollbar from 'vue-scrollbar-simple'
 import HorizontalScrollbar from './scrollbar/HorizontalScrollbar.vue'
 import VueInput from './VueInput.vue'
 import FilterPanel from './FilterPanel.vue'
+import ContextMenu from './ContextMenu.vue'
 import VuePagination from './VuePagination.vue'
 import '../assets/css/flex.css'
 import '../assets/iconfont/iconfont.css'
@@ -446,6 +458,13 @@ export default {
     // params.pageSize: (Number) The number of items displayed per page
     // params.pageSizes: (Array) Optional value of the number of items displayed per page
     params: { type: Object, default: () => { return {} } }
+  },
+  mounted() {
+    if (this.params && this.params.rowContextMenu) {
+      this.rowContextMenu = this.params.rowContextMenu;
+    } else {
+      this.rowContextMenu = [];
+    }
   },
   computed: {
     sourceData () {
@@ -700,8 +719,11 @@ export default {
         this.isLoading = true;
 
         this.remoteDataHandler(value, this.filterConfig, this.getSort(), 1, this.pageSize)
-          .then(({ data, totalItems }) => {
-            this.initData(data, totalItems);
+          .then(({ data, totalItems, contextMenu }) => {
+            this.$nextTick(() => { 
+              this.rowContextMenu = contextMenu;
+              this.initData(data, totalItems);
+            });
             this.isLoading = false;
           })
           .catch(() => {
@@ -822,8 +844,11 @@ export default {
       if (this.remoteDataSource && this.remoteDataHandler && this.currentPage !== page) {
         this.isLoading = true;
         this.remoteDataHandler(this.searchValue, this.filterConfig, this.getSort(), page, this.pageSize)
-          .then(({ data }) => {
-            this.initData(data, undefined, true);
+          .then(({ data, contextMenu }) => {
+            this.$nextTick(() => { 
+              this.rowContextMenu = contextMenu;
+              this.initData(data, undefined, true);
+            });
             this.isLoading = false;
           })
           .catch(() => {
@@ -856,8 +881,11 @@ export default {
       if (this.pageSize !== size && this.remoteDataSource && this.remoteDataHandler) {
         this.isLoading = true;
         this.remoteDataHandler(this.searchValue, this.filterConfig, this.getSort(), 1, size)
-          .then(({ data, totalItems }) => {
-            this.initData(data, totalItems);
+          .then(({ data, totalItems, contextMenu }) => {
+            this.$nextTick(() => { 
+              this.rowContextMenu = contextMenu;
+              this.initData(data, totalItems);
+            });
             this.isLoading = false;
           })
           .catch(() => {
@@ -866,6 +894,9 @@ export default {
       }
 
       this.pageSize = size;
+    },
+    onRowContextMenuAction (rowData, rowIndex, actionValue) {
+      this.$emit('row-action', rowData, rowIndex, actionValue);
     },
     /**
    * @function Jump to the target page
@@ -1113,7 +1144,7 @@ export default {
         }
       }
 
-      this.$emit('select', tableRow.checked, rowIndex, this.getRowDataFromTableRow(tableRow))
+      this.$emit('select', tableRow.checked, this.headerInfirstRow ? rowIndex - 1 : rowIndex, this.getRowDataFromTableRow(tableRow))
       this.$emit(
         'selection-change', 
         this.getCheckedRowDatas(true), 
@@ -1127,7 +1158,7 @@ export default {
    * @param {Number} rowIndex
    */
     onClickRow (tableRow, rowIndex) {
-      this.$emit('row-click', rowIndex, this.getRowDataFromTableRow(tableRow))
+      this.$emit('row-click', this.headerInfirstRow ? rowIndex - 1 : rowIndex, this.getRowDataFromTableRow(tableRow))
     },
     /**
    * @function Mouse enters Row event
@@ -1152,7 +1183,7 @@ export default {
       }
     },
     onContextmenuCell (event, tableCell, rowIndex, columnIndex) {
-      this.$emit('cell-contextmenu', event, rowIndex, columnIndex, tableCell.data)
+      this.$emit('cell-contextmenu', event, this.headerInfirstRow ? rowIndex - 1 : rowIndex, columnIndex, tableCell.data)
     },
     onMouseenterTable () {
       if (this.$refs.hscroll) {
@@ -1171,7 +1202,7 @@ export default {
    * @param {Number} columnIndex
    */
     onClickCell (tableCell, rowIndex, columnIndex) {
-      this.$emit('cell-click', rowIndex, columnIndex, tableCell.data)
+      this.$emit('cell-click', this.headerInfirstRow ? rowIndex - 1 : rowIndex, columnIndex, tableCell.data)
     },
     /**
    * @function Double-click Cell event
@@ -1203,10 +1234,10 @@ export default {
           }
           
           tableCell.data = newVal
-          this.$emit('cell-change', rowIndex, columnIndex, tableCell.data)
+          this.$emit('cell-change', this.headerInfirstRow ? rowIndex - 1 : rowIndex, columnIndex, tableCell.data)
         } else {
           tableCell.data = trim(cellEle.innerHTML)
-          this.$emit('cell-change', rowIndex, columnIndex, tableCell.data)
+          this.$emit('cell-change', this.headerInfirstRow ? rowIndex - 1 : rowIndex, columnIndex, tableCell.data)
         }
       }
     },
@@ -1228,8 +1259,11 @@ export default {
       if (this.remoteDataSource && this.remoteDataHandler) {
         this.isLoading = true;
         this.remoteDataHandler(this.searchValue, this.filterConfig, { columnIndex: index, order: value }, this.currentPage, this.pageSize)
-          .then(({ data }) => {
-            this.initData(data, undefined, true);
+          .then(({ data, contextMenu }) => {
+            this.$nextTick(() => { 
+              this.rowContextMenu = contextMenu;
+              this.initData(data, undefined, true);
+            });
             this.isLoading = false;
           })
           .catch(() => {
@@ -1290,8 +1324,11 @@ export default {
       if (this.remoteDataSource && this.remoteDataHandler) {
         this.isLoading = true;
         this.remoteDataHandler(this.searchValue, this.filterConfig, this.getSort(), 1, this.pageSize)
-          .then(({ data, totalItems }) => {
-            this.initData(data, totalItems);
+          .then(({ data, totalItems, contextMenu }) => {
+            this.$nextTick(() => { 
+              this.rowContextMenu = contextMenu;
+              this.initData(data, totalItems);
+            });
             this.isLoading = false;
           })
           .catch(() => {
@@ -1358,8 +1395,11 @@ export default {
       if (this.remoteDataSource && this.remoteDataHandler) {
         this.isLoading = true;
         this.remoteDataHandler(this.searchValue, this.filterConfig, this.getSort(), 1, this.pageSize)
-          .then(({ data, totalItems }) => {
-            this.initData(data, totalItems);
+          .then(({ data, totalItems, contextMenu }) => {
+            this.$nextTick(() => { 
+              this.rowContextMenu = contextMenu;
+              this.initData(data, totalItems);
+            });
             this.isLoading = false;
           })
           .catch(() => {
@@ -1709,7 +1749,7 @@ export default {
       this.$refs.scrollbar.scrollToX(next * this.bodyViewerWidth)
     }
   },
-  components: { VueInput, FilterPanel, VuePagination, VueScrollbar, HorizontalScrollbar }
+  components: { VueInput, FilterPanel, ContextMenu, VuePagination, VueScrollbar, HorizontalScrollbar }
 }
 </script>
 
@@ -1911,9 +1951,6 @@ $fontFamily: Arial, Helvetica, sans-serif;
 .table-check-row:hover{
   border-color: $activeColor;
 }
-.table-check-all{
-  margin-right: 8px;
-}
 .table-check-all.is-checked,
 .table-check-row.is-checked{
   border-color: $activeColor;
@@ -2018,4 +2055,38 @@ $fontFamily: Arial, Helvetica, sans-serif;
   padding-top: 10px;
 }
 
+.row-actions {
+  box-sizing: border-box;
+  height: 100%;
+  line-height: 100%;
+  overflow: hidden;
+  -webkit-flex: 0 0 30px;
+  -ms-flex: 0 0 30px;
+  flex: 0 0 30px;
+  border: none;
+}
+
+.more-dots {
+  display: inline-block;
+  cursor: pointer;
+  opacity: 0;
+  width: 20px;
+  height: 20px;
+  background-repeat: no-repeat;
+  background: url('data:image/svg+xml;utf8,<svg width="20" height="20" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="3.29037" r="1.91706"/><circle cx="10" cy="10" r="1.91706"/><circle cx="10" cy="16.70963" r="1.91706"/></svg>');
+}
+
+.v-table-row:hover .more-dots {
+  opacity: .6;
+}
+
+.v-table-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background-color: rgba(255,255,255,.6);
+  z-index: 99999;
+}
 </style>

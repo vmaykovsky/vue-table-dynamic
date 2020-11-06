@@ -83,6 +83,8 @@ const random = (length) => {
   return num.toString(16).slice(0 - length)
 }
 
+const randomBoolean = () => Math.random() >= 0.5;
+
 function timeout(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -166,6 +168,17 @@ function paginateRows(rows, page, pageSize) {
   return rows.slice(skip, skip + pageSize);
 }
 
+const rowContextMenu = [];
+for (let i = 0; i < 200; i++) {
+  rowContextMenu.push([
+    { text: `Num ${i + 1}`, value: i + 1, hidden: false, disabled: true, },
+    { text: 'Edit data', value: 'edit', hidden: randomBoolean(), disabled: randomBoolean(), },
+    { text: 'Copy item', value: 'copy', hidden: randomBoolean(), disabled: randomBoolean(), },
+    { text: 'Share item', value: 'share', hidden: randomBoolean(), disabled: randomBoolean(), },
+    { text: 'Remove item', value: 'remove', hidden: randomBoolean(), disabled: randomBoolean(), },
+  ]);
+}
+
 async function emulateRemoteData(rows, searchValue, filter, sort, page, pageSize) {
   await timeout(1000);
   let result = removeHeader(rows);
@@ -175,9 +188,13 @@ async function emulateRemoteData(rows, searchValue, filter, sort, page, pageSize
   const totalItems = result.length;
   result = paginateRows(result, page, pageSize);
 
+  const uniqueIndexes = result.map(i => i[0]);
+  const contextMenu = rowContextMenu.filter(i => uniqueIndexes.includes(i[0].value));
+
   return {
     totalItems,
     data: [['Index', 'Data1', 'Data2', 'Data3']].concat(result),
+    contextMenu,
   };
 }
 
@@ -198,8 +215,8 @@ const defaultTableParams = {
   enableSearch: true,
   // activedColor: '#046FDB',
   headerBgColor: '#efefef',
-  columnWidth: [{column: 0, width: 120}, {column: 1, width: 150}, {column: 2, width: '30%' }, {column: 3,  width: 200},],
-  fixed: 1,
+  columnWidth: [{column: 0, width: 120}, {column: 1, width: 150}, {column: 2, width: 'auto' }, {column: 3,  width: 200}],
+  // fixed: 1,
   sort: [0, { 
     column: 1, 
     ascending: (a, b) => { return parseInt(a) > parseInt(b) ? 1 : -1 }, 
@@ -238,6 +255,8 @@ const defaultTableParams = {
 for (let i = 0; i < 200; i++) {
   defaultTableParams.data.push([i+1, `${random()}-Cell`, `${random()}-Cell`, `${random()}-Cell`])
 }
+
+defaultTableParams.rowContextMenu = rowContextMenu;
 
 const tableHeaderTypes = ['', 'row', 'column']
 

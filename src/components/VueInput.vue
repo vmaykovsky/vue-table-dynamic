@@ -42,6 +42,7 @@
 </template>
 
 <script>
+import { debounce } from '../utils/util.js'
 export default {
   name: 'VueInput',
   data () {
@@ -107,12 +108,12 @@ export default {
       this.isComposing = false
       this.handleInput(event)
     },
-    handleInput (event) {
-      if (this.isComposing) return
-      if (event.target.value === this.nativeInputValue) return
-      this.$emit('input', event.target.value)
-      this.$nextTick(this.setNativeInputValue)
-    },
+    handleInput: debounce(function (event) {
+      if (this.isComposing) return;
+      if (event.target.value === this.nativeInputValue) return;
+      this.$emit('input', event.target.value);
+      this.$nextTick(this.setNativeInputValue);
+    }, 300),
     handleFocus (event) {
       this.focused = true
       this.$emit('focus', event)

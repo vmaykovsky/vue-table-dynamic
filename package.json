@@ -1,6 +1,6 @@
 {
   "name": "vue-table-dynamic-remote",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "A vue component of dynamic table",
   "main": "dist/index.min.js",
   "scripts": {
