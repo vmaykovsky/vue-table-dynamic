@@ -361,7 +361,7 @@ Filter rows based on specified column data and rule
 - `filter[].column:` column index
 - `filter[].content:` filter items
 - `filter[].method:` filter rule (applicable only for client-side filtering).  
-- `filter[].operator:` filter operator (applicable only for server-side filtering): $eq/$ne/$gt/$gte/$lt/$lte/$sw/$ew.  
+- `filter[].operator:` filter operator (applicable only for server-side filtering): $eq/$ne/$gt/$gte/$lt/$lte/$sw/$ew/$in (or any custom value).  
 
 ![filter](./docs/images/filter.png) 
 
@@ -422,6 +422,7 @@ The `filter[].operator` values:
 | `$lte`   | Matches values that are less than or equal to a specified value. |
 | `$sw`   | Matches all values that start with a specified value. |
 | `$ew`   | Matches all values that end with a specified value. |
+| `$in`   | Matches all values that include specified value. |
 
 _NOTE_: the operators list can be extended by any other values or can be completely different according to your own purposes because `filter[].operator` required only for `remoteDataSource: true` mode and will be processed by your own logic on server-side.
 
@@ -868,7 +869,7 @@ The `filter` param structure (read more in [Filter](#filter) section):
 - `filter[].column:` column index
 - `filter[].content:` filter items
 - `filter[].method:` filter rule (applicable only for client-side filtering).  
-- `filter[].operator:` filter operator (applicable only for server-side filtering): $eq/$ne/$gt/$gte/$lt/$lte/$sw/$ew. 
+- `filter[].operator:` filter operator (applicable only for server-side filtering): $eq/$ne/$gt/$gte/$lt/$lte/$sw/$ew/$in. 
 
 
 ## API
