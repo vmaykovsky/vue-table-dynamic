@@ -361,7 +361,7 @@ Filter rows based on specified column data and rule
 - `filter[].column:` column index
 - `filter[].content:` filter items
 - `filter[].method:` filter rule (applicable only for client-side filtering).  
-- `filter[].operator:` filter operator (applicable only for server-side filtering): eq/ne/gt/gte/lt/lte/sw/ew.  
+- `filter[].operator:` filter operator (applicable only for server-side filtering): $eq/$ne/$gt/$gte/$lt/$lte/$sw/$ew.  
 
 ![filter](./docs/images/filter.png) 
 
@@ -414,14 +414,16 @@ export default {
 The `filter[].operator` values:
 | name | description |
 | -----| ----------- |
-| `eq`   | Matches values that are equal to a specified value. |
-| `ne`   | Matches all values that are not equal to a specified value. |
-| `gt`   | Matches values that are greater than a specified value. |
-| `gte`   | Matches values that are greater than or equal to a specified value. |
-| `lt`   | Matches values that are less than a specified value. |
-| `lte`   | Matches values that are less than or equal to a specified value. |
-| `sw`   | Matches all values that start with a specified value. |
-| `ew`   | Matches all values that end with a specified value. |
+| `$eq`   | Matches values that are equal to a specified value. |
+| `$ne`   | Matches all values that are not equal to a specified value. |
+| `$gt`   | Matches values that are greater than a specified value. |
+| `$gte`   | Matches values that are greater than or equal to a specified value. |
+| `$lt`   | Matches values that are less than a specified value. |
+| `$lte`   | Matches values that are less than or equal to a specified value. |
+| `$sw`   | Matches all values that start with a specified value. |
+| `$ew`   | Matches all values that end with a specified value. |
+
+_NOTE_: the operators list can be extended by any other values or can be completely different according to your own purposes because `filter[].operator` required only for `remoteDataSource: true` mode and will be processed by your own logic on server-side.
 
 ### Pagination
 
@@ -862,11 +864,11 @@ Handler params:
 
 
 The `filter` param structure (read more in [Filter](#filter) section):  
-- `filter:`*`Array<{column:number; content:Array<{text:string; value:string|number;}>; method:function;}>`* specify filterable columns and rules. such as: *`[{column: 0, content: [{text: '> 2', value: 2}], method: (value, cell) => { return cell.data > value }}, operator: 'gte' ]`*
+- `filter:`*`Array<{column:number; content:Array<{text:string; value:string|number;}>; method:function;}>`* specify filterable columns and rules. such as: *`[{column: 0, content: [{text: '> 2', value: 2}], method: (value, cell) => { return cell.data > value }}, operator: '$gte' ]`*
 - `filter[].column:` column index
 - `filter[].content:` filter items
 - `filter[].method:` filter rule (applicable only for client-side filtering).  
-- `filter[].operator:` filter operator (applicable only for server-side filtering): eq/ne/gt/gte/lt/lte/sw/ew. 
+- `filter[].operator:` filter operator (applicable only for server-side filtering): $eq/$ne/$gt/$gte/$lt/$lte/$sw/$ew. 
 
 
 ## API
