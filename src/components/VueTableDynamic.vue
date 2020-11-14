@@ -9,6 +9,7 @@
         <vue-input v-if="enableSearch" class="tools-search" v-model="searchValue" placeholder="Search">
           <i class="iconfont iconsearch" slot="prefix"></i>
         </vue-input>
+        <slot name="top-toolbar"></slot>
       </div>
       <div class="v-table-loader">
         <div class="v-linear-activity" v-if="isLoading">
@@ -773,6 +774,17 @@ export default {
     this.activatedFilter = {}
   },
   methods: {
+    refresh(page) {
+      if (!this.remoteDataSource || !this.remoteDataHandler) {
+        return;
+      }
+
+      if (this.$refs && this.$refs.tablePagination) {
+        const toPage = page || this.currentPage;
+        this.currentPage = -1; // a little hack to force page update
+        this.$refs.tablePagination.toPage(toPage);
+      }
+    },
     getSort() {
       const sort = {};
       if (Object.keys(this.activatedSort).length) {

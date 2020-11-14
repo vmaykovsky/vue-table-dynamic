@@ -60,6 +60,9 @@
               <vue-button class="aside-btns" type="text" size="mini" @click.stop="testSlot(props)">Test Slot2</vue-button>
             </span>
           </template>
+          <template v-slot:top-toolbar>
+            <button class="btn btn-primary">Create</button>
+          </template>
         </vue-table-dynamic>
       </vuescroll>
     </section>
