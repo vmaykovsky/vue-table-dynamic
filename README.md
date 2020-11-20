@@ -360,6 +360,7 @@ Filter rows based on specified column data and rule
 - `filter:`*`Array<{column:number; content:Array<{text:string; value:string|number;}>; method:function;}>`* specify filterable columns and rules. such as: *`[{column: 0, content: [{text: '> 2', value: 2}], method: (value, cell) => { return cell.data > value }}]`*
 - `filter[].column:` column index
 - `filter[].content:` filter items
+- `filter[].type:` filter type: `checkbox` or `radio`. Default `checkbox`
 - `filter[].method:` filter rule (applicable only for client-side filtering).  
 - `filter[].operator:` filter operator (applicable only for server-side filtering): $eq/$ne/$gt/$gte/$lt/$lte/$sw/$ew/$in (or any custom value).  
 

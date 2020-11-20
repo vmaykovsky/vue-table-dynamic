@@ -100,6 +100,7 @@
                 >
                   <filter-panel 
                     :content="filterConfig[j].content"
+                    :type="filterConfig[j].type"
                     :lang="lang"
                     @filter="(checked) => { onFilter(j, checked, filterConfig[j]) }"
                     @reset="clearFilter(j)"

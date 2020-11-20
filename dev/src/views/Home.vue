@@ -230,6 +230,7 @@ const defaultTableParams = {
   highlight: {},
   filter: [{
     column: 0,
+    type: 'radio',
     operator: 'gt',
     content: [{text: '> 20', value: 20}, {text: '> 50', value: 50}, {text: '> 100', value: 100}], 
     method: (value, tableCell) => { return tableCell.data > value }

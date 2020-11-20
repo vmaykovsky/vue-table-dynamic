@@ -16,8 +16,8 @@
           <div v-for="(item, index) in filters" :key="index" class="filter-item flex-c">
             <div 
               class="filter-check flex-c-c"
-              :class="{ 'is-checked': item.checked }"
-              @click.stop="item.checked = !item.checked"
+              :class="{ 'is-checked': item.checked, 'filter-radio': type === 'radio' }"
+              @click.stop="onClick(item)"
             >
               <i class="iconfont iconcheck" v-show="item.checked"></i>
             </div>
@@ -58,6 +58,7 @@ export default {
   props: {
     disabled: { type: Boolean,default: false },
     content: { type: Array, default: () => [] },
+    type: { type: String, default: () => 'checkbox' },
     lang: { type: String, default: 'en_US' }
   },
   watch: {
@@ -145,6 +146,15 @@ export default {
     handleAfterLeave () {
       this.$emit('after-leave')
     },
+    onClick(item) {
+      if (this.type === 'checkbox') {
+        item.checked = !item.checked
+        return;
+      } else if (this.type === 'radio') {
+        this.filters.forEach(f => { f.checked = false });
+        item.checked = true;
+      }
+    },
     doFilter () {
       if (!this.filterable) return
 
@@ -213,6 +223,12 @@ $fontFamily: Arial, Helvetica, sans-serif;
   overflow: hidden;
   i.iconfont{
     font-size: 12px;
+  }
+}
+.filter-check.filter-radio {
+  border-radius: 50%;
+  i.iconfont{
+    font-size: 10px;
   }
 }
 .filter-check:hover{
