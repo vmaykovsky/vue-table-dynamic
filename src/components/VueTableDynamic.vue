@@ -112,7 +112,7 @@
                 </span>
               </span>
             </div>
-            <div class="flex-c-c row-actions">
+            <div v-if="rowContextMenu && rowContextMenu.length" class="flex-c-c row-actions">
             </div>
           </div>
         </div>
@@ -186,7 +186,8 @@
                   </slot>
                 </div>
                 <div v-if="rowContextMenu && rowContextMenu.length && rowContextMenu.length > i - (headerInfirstRow ? 1 : 0)" class="flex-c-c row-actions">
-                  <context-menu 
+                  <context-menu
+                    v-if="rowContextMenu[i - (headerInfirstRow ? 1 : 0)] && rowContextMenu[i - (headerInfirstRow ? 1 : 0)].length"
                     :content="rowContextMenu[i - (headerInfirstRow ? 1 : 0)]"
                     @select="(value) => onRowContextMenuAction(tableRow, i - (headerInfirstRow ? 1 : 0), value)"
                   >
@@ -430,6 +431,7 @@ export default {
       hMovement: 0,
       isLoading: false,
       currentPage: 1,
+      rowContextMenu: [],
     }
   },
   props: {

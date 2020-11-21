@@ -173,6 +173,11 @@ function paginateRows(rows, page, pageSize) {
 
 const rowContextMenu = [];
 for (let i = 0; i < 200; i++) {
+  if ((i + 1) % 3 === 0) {
+    rowContextMenu.push([]);
+    continue;
+  }
+
   rowContextMenu.push([
     { text: `Num ${i + 1}`, value: i + 1, hidden: false, disabled: true, },
     { text: 'Edit data', value: 'edit', hidden: randomBoolean(), disabled: randomBoolean(), },
