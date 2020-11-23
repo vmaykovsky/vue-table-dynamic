@@ -1335,6 +1335,9 @@ export default {
       if (!(this.tableData && this.tableData.rows)) return;
 
       this.activatedFilter[columnIndex] = true;
+      if (this.filterConfig[columnIndex].type === 'daterange') {
+        this.filterConfig[columnIndex].content[0].value = checked[0].value;
+      }
 
       if (this.remoteDataSource && this.remoteDataHandler) {
         this.isLoading = true;

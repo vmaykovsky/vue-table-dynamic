@@ -16,6 +16,7 @@
   "dependencies": {
     "lodash.throttle": "^4.1.1",
     "lodash.trim": "^4.5.1",
+    "v-calendar": "^2.1.1",
     "vue-scrollbar-simple": "0.0.3"
   },
   "devDependencies": {

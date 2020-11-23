@@ -12,8 +12,8 @@
         :style="{ top: y, left: x }"
         ref="content"
       >
-        <div class="filter-body">
-          <div v-for="(item, index) in filters" :key="index" class="filter-item flex-c">
+        <div v-if="type !== 'daterange'" class="filter-body">
+          <div  v-for="(item, index) in filters" :key="index" class="filter-item flex-c">
             <div 
               class="filter-check flex-c-c"
               :class="{ 'is-checked': item.checked, 'filter-radio': type === 'radio' }"
@@ -23,6 +23,66 @@
             </div>
             <span class="filter-text">{{ item.text }}</span>
           </div>
+        </div>
+        <div v-if="type === 'daterange'" class="filter-body">
+          <date-picker
+            style="display: inline-block;position:relative;"
+            v-model="dateRange"
+            mode="dateTime"
+            is-range
+            is24hr
+            @input="onDateRangeInput"
+          >
+            <template v-slot="{ inputValue, inputEvents, isDragging }">
+              <span v-if="filters[0].text" style="display: inline-block; margin: 5px 0">{{filters[0].text}}</span>
+              <div class="picker-row">
+                <div class="picker-input-wrapper">
+                  <svg
+                    class="text-gray-600 w-4 h-full mx-2 absolute pointer-events-none"
+                    fill="none"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    ></path>
+                  </svg>
+                  <input
+                    class="picker-input bg-gray-100"
+                    placeholder="Start"
+                    :class="isDragging ? 'text-gray-600' : 'text-gray-900'"
+                    :value="inputValue.start"
+                    v-on="inputEvents.start"
+                  />
+                </div>
+                <div class="picker-input-wrapper">
+                  <svg
+                    class="text-gray-600 w-4 h-full mx-2 absolute pointer-events-none"
+                    fill="none"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    ></path>
+                  </svg>
+                  <input
+                    class="picker-input bg-gray-100"
+                    placeholder="End"
+                    :class="isDragging ? 'text-gray-600' : 'text-gray-900'"
+                    :value="inputValue.end"
+                    v-on="inputEvents.end"
+                  />
+                </div>
+              </div>
+            </template>
+          </date-picker>
         </div>
         <div class="filter-footer flex-c-b">
           <span class="filter-btns" @click="doReset">{{ lang === 'en_US' ? 'Reset' : '重置' }}</span>
@@ -38,9 +98,11 @@
 
 <script>
 import Display from '../utils/display.js'
+import DatePicker from 'v-calendar/lib/components/date-picker.umd'
 
 export default {
   name: 'FilterPanel',
+  components: { DatePicker },
   data() {
     return {
       isShow: { value: false },
@@ -52,7 +114,8 @@ export default {
       activeEle: null,
       filters: [],
       filterable: false,
-      checkedCache: []
+      checkedCache: [],
+      dateRange: null,
     }
   },
   props: {
@@ -76,6 +139,10 @@ export default {
           if (item && typeof item.text === 'string' && typeof item.value !== 'undefined') {
             this.filters.push(item)
           }
+        }
+
+        if (this.type === 'daterange' && value.length > 0) {
+          this.dateRange = value[0].value;
         }
       },
       deep: true,
@@ -156,17 +223,33 @@ export default {
       }
     },
     doFilter () {
-      if (!this.filterable) return
+      if (!this.filterable) return;
 
-      this.checked = this.filters.filter(f => { return f.checked })
-      this.$emit('filter', this.checked)
-      this.isShow.value = false
+      this.checked = this.filters.filter(f => { return f.checked });
+      this.$emit('filter', this.checked);
+      this.isShow.value = false;
     },
     doReset () {
-      this.filters.forEach(f => { f.checked = false })
-      this.$emit('reset', '')
-      this.isShow.value = false
-    }
+      if (this.type === 'daterange') {
+        this.dateRange = null;
+      }
+
+      this.filters.forEach(f => { f.checked = false });
+      this.$emit('reset', '');
+      this.isShow.value = false;
+    },
+    onDateRangeInput() {
+      if (!this.dateRange) {
+        this.filters[0].checked = false;
+        return;
+      }
+
+      this.filters[0].checked = true;
+      this.filters[0].value = {
+        start: this.dateRange.start,
+        end: this.dateRange.end,
+      };
+    },
   }
 }
 </script>
@@ -294,4 +377,41 @@ $fontFamily: Arial, Helvetica, sans-serif;
   -o-transform: scaleY(0);
 }
 
+.picker-row {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-direction: column;
+}
+
+.picker-input-wrapper {
+  position: relative;
+  flex-grow: 1;
+  margin: 3px 0;
+}
+
+.picker-input {
+  padding-left: 1.8rem;
+  padding-right: .5rem;
+  padding-top: .25rem;
+  padding-bottom: .25rem;
+  flex-grow: 1;
+  border: 1px solid #e2e8f0;
+  border-radius: .25rem;
+  overflow: visible;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.15;
+  margin: 0;
+}
+
+.bg-gray-100 { background-color: #f7fafc; }
+.text-gray-600 { color: #718096; }
+.text-gray-900 { color: #1a202c; }
+.stroke-current { stroke: currentColor; }
+.absolute { position: absolute; }
+.pointer-events-none { pointer-events: none; }
+.w-4 { width: 1rem; }
+.mx-2 { margin-left: .5rem; margin-right: .5rem; }
+.h-full { height: 100%; }
 </style>

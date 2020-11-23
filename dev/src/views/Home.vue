@@ -54,7 +54,10 @@
           <template v-if="useSlot" v-slot:column-0="{ props }">
             <span class="cell--slot-1">Slot::{{props.cellData}}--{{props.row}}--{{props.column}}</span>
           </template>
-          <template v-if="useSlot"  v-slot:column-3="{ props }">
+          <template v-slot:column-4="{ props }">
+            {{props.cellData instanceof Date ? props.cellData.toLocaleString() : props.cellData}}
+          </template>
+          <template v-if="useSlot"  v-slot:column-5="{ props }">
             <span class="cell--slot-2">
               <vue-button class="aside-btns aside-btns-slot" size="mini" @click.stop="testSlot(props)">Test Slot1</vue-button>
               <vue-button class="aside-btns" type="text" size="mini" @click.stop="testSlot(props)">Test Slot2</vue-button>
@@ -87,32 +90,32 @@ const random = (length) => {
 }
 
 const randomBoolean = () => Math.random() >= 0.5;
-
-function timeout(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
+const randomDate = (start, end) => new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+const timeout = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 function compare(a, operator, b) {
   const aa = typeof a === 'number' ? a : String(a).toLowerCase();
   const bb = typeof b === 'number' ? b : String(b).toLowerCase();
 
   switch(operator) {
-    case 'eq':
+    case '$eq':
       return aa === bb;
-    case 'ne':
+    case '$ne':
       return aa !== bb;
-    case 'gt':
+    case '$gt':
       return aa > bb;
-    case 'gte':
+    case '$gte':
       return aa >= bb;
-    case 'lt':
+    case '$lt':
       return aa < bb;
-    case 'lte':
+    case '$lte':
       return aa <= bb;
-    case 'sw':
+    case '$sw':
       return aa.startsWith(bb);
-    case 'ew':
+    case '$ew':
       return aa.endsWith(bb);
+    case '$between':
+      return aa >= bb.start && a <= bb.end;
     default:
       return false;
   }
@@ -201,14 +204,14 @@ async function emulateRemoteData(rows, searchValue, filter, sort, page, pageSize
 
   return {
     totalItems,
-    data: [['Index', 'Data1', 'Data2', 'Data3']].concat(result),
+    data: [['Index', 'Data1', 'Data2', 'Data3', 'Date']].concat(result),
     contextMenu,
   };
 }
 
 const defaultTableParams = {
   data: [
-    ['Index', 'Data1', 'Data2', 'Data3']
+    ['Index', 'Data1', 'Data2', 'Data3', 'Date']
   ],
   header: 'row',
   height: '',
@@ -233,18 +236,31 @@ const defaultTableParams = {
   ],
   edit: {},
   highlight: {},
-  filter: [{
-    column: 0,
-    type: 'radio',
-    operator: 'gt',
-    content: [{text: '> 20', value: 20}, {text: '> 50', value: 50}, {text: '> 100', value: 100}], 
-    method: (value, tableCell) => { return tableCell.data > value }
-  }, {
-    column: 2,
-    operator: 'ew',
-    content: [{text: '*1-Cell', value: '1-Cell'}, {text: '*2-Cell', value: '2-Cell'}, {text: '*3-Cell', value: '3-Cell'}], 
-    method: (value, tableCell) => { return String(tableCell.data).toLocaleLowerCase().endsWith(String(value).toLocaleLowerCase()) }
-  }],
+  filter: [
+    {
+      column: 0,
+      type: 'radio',
+      operator: '$gt',
+      content: [{text: '> 20', value: 20}, {text: '> 50', value: 50}, {text: '> 100', value: 100}], 
+      method: (value, tableCell) => { return tableCell.data > value }
+    },
+    {
+      column: 2,
+      operator: '$ew',
+      content: [{text: '*1-Cell', value: '1-Cell'}, {text: '*2-Cell', value: '2-Cell'}, {text: '*3-Cell', value: '3-Cell'}], 
+      method: (value, tableCell) => { return String(tableCell.data).toLocaleLowerCase().endsWith(String(value).toLocaleLowerCase()) }
+    },
+    {
+      column: 4,
+      type: 'daterange',
+      operator: '$between',
+      content: [{ text: 'Date range', value: { start: new Date((new Date()).getTime() - 10*24*60*60*1000), end: new Date() }}],
+      method: (value, tableCell) => {
+        const cellData = tableCell.data instanceof Date ? tableCell.data : new Date(tableCell.data);
+        return cellData >= value.start && cellData <= value.end;
+      }
+    },
+  ],
   // style: {
   //   row: [{ scope: [0], styles: { color: '#046FDB'}}]
   // },
@@ -262,12 +278,12 @@ const defaultTableParams = {
 }
 
 for (let i = 0; i < 200; i++) {
-  defaultTableParams.data.push([i+1, `${random()}-Cell`, `${random()}-Cell`, `${random()}-Cell`])
+  defaultTableParams.data.push([i+1, `${random()}-Cell`, `${random()}-Cell`, `${random()}-Cell`, randomDate(new Date(2020, 0, 1), new Date())]);
 }
 
 defaultTableParams.rowContextMenu = rowContextMenu;
 
-const tableHeaderTypes = ['', 'row', 'column']
+const tableHeaderTypes = ['', 'row', 'column'];
 
 export default {
   name: 'Home',

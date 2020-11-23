@@ -360,9 +360,9 @@ Filter rows based on specified column data and rule
 - `filter:`*`Array<{column:number; content:Array<{text:string; value:string|number;}>; method:function;}>`* specify filterable columns and rules. such as: *`[{column: 0, content: [{text: '> 2', value: 2}], method: (value, cell) => { return cell.data > value }}]`*
 - `filter[].column:` column index
 - `filter[].content:` filter items
-- `filter[].type:` filter type: `checkbox` or `radio`. Default `checkbox`
+- `filter[].type:` filter type: `checkbox`, `radio` or `daterange`. Default `checkbox`
 - `filter[].method:` filter rule (applicable only for client-side filtering).  
-- `filter[].operator:` filter operator (applicable only for server-side filtering): $eq/$ne/$gt/$gte/$lt/$lte/$sw/$ew/$in (or any custom value).  
+- `filter[].operator:` filter operator (applicable only for server-side filtering): $eq/$ne/$gt/$gte/$lt/$lte/$sw/$ew/$in/$between (or any custom value).  
 
 ![filter](./docs/images/filter.png) 
 
@@ -399,8 +399,13 @@ export default {
           method: (value, tableCell) => { return tableCell.data > value }
         }, {
           column: 3, 
-          content: [{text: '2019-01-01', value: '2019-01-01'}, {text: '2019-02-02', value: '2019-02-02'}], 
-          method: (value, tableCell) => { return String(tableCell.data).toLocaleLowerCase().includes(String(value).toLocaleLowerCase()) }
+          type: 'daterange', 
+          operator: 'between', 
+          content: [{text: 'Date range', value: { start: new Date('2019-01-01'), end: new Date('2019-03-03') } }], 
+          method: (value, tableCell) => {
+            const cellData = tableCell.data instanceof Date ? tableCell.data : new Date(tableCell.data);
+            return cellData >= value.start && cellData <= value.end;
+          },
         }],
       }
     }
@@ -424,6 +429,7 @@ The `filter[].operator` values:
 | `$sw`   | Matches all values that start with a specified value. |
 | `$ew`   | Matches all values that end with a specified value. |
 | `$in`   | Matches all values that include specified value. |
+| `$between`   | Matches all values that between specified range `{ start: any, end: any }`. |
 
 _NOTE_: the operators list can be extended by any other values or can be completely different according to your own purposes because `filter[].operator` required only for `remoteDataSource: true` mode and will be processed by your own logic on server-side.
 
@@ -870,7 +876,7 @@ The `filter` param structure (read more in [Filter](#filter) section):
 - `filter[].column:` column index
 - `filter[].content:` filter items
 - `filter[].method:` filter rule (applicable only for client-side filtering).  
-- `filter[].operator:` filter operator (applicable only for server-side filtering): $eq/$ne/$gt/$gte/$lt/$lte/$sw/$ew/$in. 
+- `filter[].operator:` filter operator (applicable only for server-side filtering): $eq/$ne/$gt/$gte/$lt/$lte/$sw/$ew/$in/$between. 
 
 
 ## API
