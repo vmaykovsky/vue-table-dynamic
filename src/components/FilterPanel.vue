@@ -32,6 +32,7 @@
             is-range
             is24hr
             @input="onDateRangeInput"
+            :popover="{placement: 'left-start'}"
           >
             <template v-slot="{ inputValue, inputEvents, isDragging }">
               <span v-if="filters[0].text" style="display: inline-block; margin: 5px 0">{{filters[0].text}}</span>
