@@ -390,18 +390,18 @@ export default {
           [2, 'ec0b78', 'ecf03c', '2019-02-02 11:11'],
           [3, '7c95f7', 'fdf451', '2019-02-02 12:12'],
           [4, 'ba045d', '34fdgh', '2019-02-02 13:13'],
-          [5, 'a8c325', '4678de', '2019-03-03 14:14']
+          [5, 'a8c325', '4678de', '2019-03-03 14:14'],
         ],
         header: 'row',
         filter: [{
-          column: 0, 
-          content: [{text: '> 2', value: 2}, {text: '> 4', value: 4}], 
-          method: (value, tableCell) => { return tableCell.data > value }
+          column: 0,
+          content: [{text: '> 2', value: 2}, {text: '> 4', value: 4}],
+          method: (value, tableCell) => { return tableCell.data > value },
         }, {
-          column: 3, 
-          type: 'daterange', 
-          operator: 'between', 
-          content: [{text: 'Date range', value: { start: new Date('2019-01-01'), end: new Date('2019-03-03') } }], 
+          column: 3,
+          type: 'daterange',
+          operator: '$between',
+          content: [{text: 'Date range', value: { start: new Date('2019-01-01'), end: new Date('2019-03-03') } }],
           method: (value, tableCell) => {
             const cellData = tableCell.data instanceof Date ? tableCell.data : new Date(tableCell.data);
             return cellData >= value.start && cellData <= value.end;
@@ -412,7 +412,7 @@ export default {
   },
   methods: {
   },
-  components: { VueTableDynamic }
+  components: { VueTableDynamic },
 }
 </script>
 ```
