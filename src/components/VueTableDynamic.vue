@@ -71,7 +71,7 @@
               >
                 <span 
                   class="table-cell-content" 
-                  :style="{ whiteSpace: whiteSpace, wordWrap: wordWrap, textOverflow: textOverflow, ...getStyleCustomized(0, j) }"
+                  :style="{ flexGrow: 1, whiteSpace: whiteSpace, wordWrap: wordWrap, textOverflow: textOverflow, ...getStyleCustomized(0, j) }"
                 >
                   {{ tableCell.data }}
                 </span>
