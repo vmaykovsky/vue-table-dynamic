@@ -399,6 +399,21 @@ export default {
           content: [{text: '> 2', value: 2}, {text: '> 4', value: 4}],
           method: (value, tableCell) => { return tableCell.data > value },
         }, {
+          column: 2,
+          operator: '$eq',
+          type: 'multiselect',
+          content: [],
+          method: (value, tableCell) => { return String(tableCell.data).toLocaleLowerCase() === String(value).toLocaleLowerCase(); },
+          search: async (searchValue, tableState) => {
+            if (!searchValue) {
+              return null;
+            }
+
+            return this.data
+              .filter(i => String(i[3]).toLocaleLowerCase().indexOf(String(searchValue).toLocaleLowerCase()) > -1)
+              .map(i => ({ text: i[3], value: i[3] }));
+          },
+        }, {
           column: 3,
           type: 'daterange',
           operator: '$between',
