@@ -358,10 +358,11 @@ export default {
 Filter rows based on specified column data and rule
 
 - `filter:`*`Array<{column:number; content:Array<{text:string; value:string|number;}>; method:function;}>`* specify filterable columns and rules. such as: *`[{column: 0, content: [{text: '> 2', value: 2}], method: (value, cell) => { return cell.data > value }}]`*
-- `filter[].column:` column index
-- `filter[].content:` filter items
-- `filter[].type:` filter type: `checkbox`, `radio` or `daterange`. Default `checkbox`
-- `filter[].method:` filter rule (applicable only for client-side filtering).  
+- `filter[].column:` column index.
+- `filter[].content:` filter items.
+- `filter[].type:` filter type: `checkbox`, `radio`, `daterange`, `select` or `multiselect`. Default is `checkbox`.
+- `filter[].method:` filter rule (applicable only for client-side filtering).
+- `filter[].search:` filter search function (applicable for `select` or `multiselect` filter types).  
 - `filter[].operator:` filter operator (applicable only for server-side filtering): $eq/$ne/$gt/$gte/$lt/$lte/$sw/$ew/$in/$between (or any custom value).  
 
 ![filter](./docs/images/filter.png) 
@@ -849,6 +850,7 @@ export default {
           return {
             totalItems,    // total amount of rows in table
             data,          // rows array for the current page (has the same structure as `data` when table initialization)
+            contextMenu,   // rows context menus
           };
         },
       }
@@ -875,8 +877,10 @@ The `filter` param structure (read more in [Filter](#filter) section):
 - `filter:`*`Array<{column:number; content:Array<{text:string; value:string|number;}>; method:function;}>`* specify filterable columns and rules. such as: *`[{column: 0, content: [{text: '> 2', value: 2}], method: (value, cell) => { return cell.data > value }}, operator: '$gte' ]`*
 - `filter[].column:` column index
 - `filter[].content:` filter items
-- `filter[].method:` filter rule (applicable only for client-side filtering).  
-- `filter[].operator:` filter operator (applicable only for server-side filtering): $eq/$ne/$gt/$gte/$lt/$lte/$sw/$ew/$in/$between. 
+- `filter[].type:` filter type: `checkbox`, `radio`, `daterange`, `select` or `multiselect`. Default is `checkbox`.
+- `filter[].method:` filter rule (applicable only for client-side filtering).
+- `filter[].search:` filter search function (applicable for `select` or `multiselect` filter types).
+- `filter[].operator:` filter operator (applicable only for server-side filtering): $eq/$ne/$gt/$gte/$lt/$lte/$sw/$ew/$in/$between.
 
 
 ## API
@@ -908,7 +912,7 @@ The `filter` param structure (read more in [Filter](#filter) section):
 | `rowHeight` | row height  | `number`  | `>= 24` | `30` |
 | `columnWidth` | Configure column width | Array<{column:number; width:number/string;}> | - | - |
 | `sort` | sort rows based on specified column data | `Array<number>` | - | - |
-| `filter` | filter rows based on specified column data and rule. `column`: index; `content`: filter items; `method` filter rule. | Array<{column, content, method}> | - | - |
+| `filter` | filter rows based on specified column data and rule. `column`: index; `operator`: filter operator, `type`: filter type, `content`: filter items; `method`: filter rule, `search`: filter search function. | Array<{column, operator, type, content, method, search}> | - | - |
 | `edit` | specifying rows/columns/cells for editing. table data changed after editing, get the latest data by `getData` method | {row?:Array<>; column?:Array<>; cell?:Array<>;} | -  | - |
 | `pagination` | table with pagination | `boolean`  | `true`/`false` | `false`   |
 | `pageSize`  | row count of each page | `number`   | -   | `10` |

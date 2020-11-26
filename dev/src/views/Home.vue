@@ -54,10 +54,10 @@
           <template v-if="useSlot" v-slot:column-0="{ props }">
             <span class="cell--slot-1">Slot::{{props.cellData}}--{{props.row}}--{{props.column}}</span>
           </template>
-          <template v-slot:column-4="{ props }">
+          <template v-slot:column-5="{ props }">
             {{props.cellData instanceof Date ? props.cellData.toLocaleString() : props.cellData}}
           </template>
-          <template v-if="useSlot"  v-slot:column-5="{ props }">
+          <template v-if="useSlot"  v-slot:column-6="{ props }">
             <span class="cell--slot-2">
               <vue-button class="aside-btns aside-btns-slot" size="mini" @click.stop="testSlot(props)">Test Slot1</vue-button>
               <vue-button class="aside-btns" type="text" size="mini" @click.stop="testSlot(props)">Test Slot2</vue-button>
@@ -123,7 +123,7 @@ function compare(a, operator, b) {
 
 function removeHeader(rows) {
   return rows.filter(row => {
-    if (JSON.stringify(row) === JSON.stringify(['Index', 'Data1', 'Data2', 'Data3'])) {
+    if (JSON.stringify(row) === JSON.stringify(['Index (radio)', 'Data1', 'Checkbox Data2', 'Select Data 3', 'Multiselect Data4'])) {
       return false;
     }
 
@@ -200,18 +200,17 @@ async function emulateRemoteData(rows, searchValue, filter, sort, page, pageSize
   result = paginateRows(result, page, pageSize);
 
   const uniqueIndexes = result.map(i => i[0]);
-  const contextMenu = rowContextMenu.filter(i => uniqueIndexes.includes(i[0].value));
-
+  const contextMenu = rowContextMenu.filter(i => i.length > 0 && uniqueIndexes.includes(i[0].value));
   return {
     totalItems,
-    data: [['Index', 'Data1', 'Data2', 'Data3', 'Date']].concat(result),
+    data: [['Index (radio)', 'Data1', 'Checkbox Data2', 'Select Data 3', 'Multiselect Data4', 'Date']].concat(result),
     contextMenu,
   };
 }
 
 const defaultTableParams = {
   data: [
-    ['Index', 'Data1', 'Data2', 'Data3', 'Date']
+    ['Index (radio)', 'Data1', 'Checkbox Data2', 'Select Data 3', 'Multiselect Data4', 'Date']
   ],
   header: 'row',
   height: '',
@@ -226,7 +225,7 @@ const defaultTableParams = {
   enableSearch: true,
   // activedColor: '#046FDB',
   headerBgColor: '#efefef',
-  columnWidth: [{column: 0, width: 120}, {column: 1, width: 150}, {column: 2, width: 'auto' }, {column: 3,  width: 200}],
+  columnWidth: [{column: 0, width: 130}, {column: 1, width: 80}, {column: 5,  width: 140}],
   // fixed: 1,
   sort: [0, { 
     column: 1, 
@@ -251,7 +250,41 @@ const defaultTableParams = {
       method: (value, tableCell) => { return String(tableCell.data).toLocaleLowerCase().endsWith(String(value).toLocaleLowerCase()) }
     },
     {
+      column: 3,
+      operator: '$eq',
+      type: 'select',
+      content: [],
+      method: (value, tableCell) => { return String(tableCell.data).toLocaleLowerCase() === String(value).toLocaleLowerCase(); },
+      search: async (searchValue, tableState) => {
+        if (!searchValue) {
+          return null;
+        }
+
+        await timeout(800);
+        return defaultTableParams.data
+          .filter(i => String(i[3]).toLocaleLowerCase().indexOf(String(searchValue).toLocaleLowerCase()) > -1)
+          .map(i => ({ text: i[3], value: i[3] }));
+      },
+    },
+    {
       column: 4,
+      operator: '$eq',
+      type: 'multiselect',
+      content: [],
+      method: (value, tableCell) => { return String(tableCell.data).toLocaleLowerCase() === String(value).toLocaleLowerCase(); },
+      search: async (searchValue, tableState) => {
+        if (!searchValue) {
+          return null;
+        }
+
+        await timeout(800);
+        return defaultTableParams.data
+          .filter(i => String(i[4]).toLocaleLowerCase().indexOf(String(searchValue).toLocaleLowerCase()) > -1)
+          .map(i => ({ text: i[4], value: i[4] }));
+      },
+    },
+    {
+      column: 5,
       type: 'daterange',
       operator: '$between',
       content: [{ text: 'Date range', value: { start: new Date((new Date()).getTime() - 10*24*60*60*1000), end: new Date() }}],
@@ -278,7 +311,7 @@ const defaultTableParams = {
 }
 
 for (let i = 0; i < 200; i++) {
-  defaultTableParams.data.push([i+1, `${random()}-Cell`, `${random()}-Cell`, `${random()}-Cell`, randomDate(new Date(2020, 0, 1), new Date())]);
+  defaultTableParams.data.push([i+1, `${random()}-Cell`, `${random()}-Cell`, `${random()}-Cell`, `${random()}-Cell`, randomDate(new Date(2020, 0, 1), new Date())]);
 }
 
 defaultTableParams.rowContextMenu = rowContextMenu;

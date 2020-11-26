@@ -24,7 +24,7 @@ export default {
   data () {
     return {
       logoImg,
-      logoText: 'Vue Table Dynamic',
+      logoText: 'Vue Table Dynamic Remote',
       menus: [{
         key: 'github',
         name: 'GitHub',

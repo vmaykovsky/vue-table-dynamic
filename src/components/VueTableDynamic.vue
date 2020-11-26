@@ -98,12 +98,16 @@
                   class="table-filter flex-c-c" 
                   :style="{ height: headerHeight + 'px' }" 
                 >
-                  <filter-panel 
+                  <filter-panel
+                    :ref="`filter-${j}`"
                     :content="filterConfig[j].content"
                     :type="filterConfig[j].type"
+                    :search="filterConfig[j].search"
                     :lang="lang"
+                    @enter="() => { onFilterEnter(j) }"
                     @filter="(checked) => { onFilter(j, checked, filterConfig[j]) }"
                     @reset="clearFilter(j)"
+                    @search="(filter, searchValue) => { onFilterSearch(filter, searchValue) }"
                   >
                     <i slot="reference" class="iconfont icondown"
                       :style="{ color: activatedFilter[j] ? activedColor : '#C0C4CC' }">
@@ -274,11 +278,16 @@
                   class="table-filter flex-c-c" 
                   :style="{ height: headerHeight + 'px' }" 
                 >
-                  <filter-panel 
-                    :content="filterConfig[j].content" 
+                  <filter-panel
+                    :ref="`filter-${j}`"
+                    :content="filterConfig[j].content"
+                    :type="filterConfig[j].type"
+                    :search="filterConfig[j].search"
                     :lang="lang"
+                    @enter="() => { onFilterEnter(j) }"
                     @filter="(checked) => { onFilter(j, checked, filterConfig[j]) }"
                     @reset="clearFilter(j)"
+                    @search="(filter, searchValue) => { onFilterSearch(filter, searchValue) }"
                   >
                     <i slot="reference" class="iconfont icondown" 
                       :style="{ color: activatedFilter[j] ? activedColor : '#C0C4CC' }"
@@ -644,7 +653,12 @@ export default {
       if (this.params && unemptyArray(this.params.filter)) {
         let filterObj = {}
         this.params.filter.forEach(f => {
-          if (f && typeof f.column === 'number' && f.column >= 0 && typeof ((f.method === 'function' && !this.remoteDataSource) || (f.operator && this.remoteDataSource)) && unemptyArray(f.content)) {
+          if (f
+            && typeof f.column === 'number'
+            && f.column >= 0
+            && typeof ((f.method === 'function' && !this.remoteDataSource) || (f.operator && this.remoteDataSource))
+            && (['datetime', 'select', 'multiselect'].includes(f.type) || unemptyArray(f.content))
+          ) {
             if (f.content.every(c => { return (c && typeof c.text === 'string' && typeof c.value !== 'undefined') })) {
               let content = f.content.map(c => { return { ...c, checked: false, key: unique(`content-`) } })
               filterObj[f.column] = { ...f, content, key: unique(`filter-`) }
@@ -1325,6 +1339,20 @@ export default {
       this.updateActivatedRows()
       this.$nextTick(this.updatePagination)
     },
+    onFilterEnter(columnIndex) {
+      Object.keys(this.filterConfig).forEach(key => {
+        if (columnIndex === this.filterConfig[key].column) {
+          return;
+        }
+
+        const filter = this.$refs[`filter-${this.filterConfig[key].column}`];
+        if(filter && Array.isArray(filter) && filter.length) {
+          filter.forEach(i => {
+            if (i.display) i.display.doClose();
+          });
+        }
+      });
+    },
     /**
    * @function Filter based on a column of data
    * @param {Number} columnIndex
@@ -1337,6 +1365,8 @@ export default {
       this.activatedFilter[columnIndex] = true;
       if (this.filterConfig[columnIndex].type === 'daterange') {
         this.filterConfig[columnIndex].content[0].value = checked[0].value;
+      } else if (['select', 'multiselect'].includes(this.filterConfig[columnIndex].type)) {
+        this.filterConfig[columnIndex].content = checked;
       }
 
       if (this.remoteDataSource && this.remoteDataHandler) {
@@ -1368,6 +1398,31 @@ export default {
       this.tableData.filteredRows[columnIndex] = filteredArr;
 
       this.updateFilteredRows();
+    },
+    async onFilterSearch (filter, searchValue) {
+      if (!filter || typeof filter.search !== 'function') {
+        return;
+      }
+
+      if (!searchValue) {
+        return;
+      }
+
+      filter.isLoading = true;
+      try {
+        const result = await filter.search(searchValue, {
+          searchValue: this.searchValue,
+          filter: this.filterConfig,
+          sort: this.getSort(),
+          page: this.currentPage,
+          pageSize: this.pageSize,
+        });
+
+        if (result && Array.isArray(result)) {
+          filter.options = result;
+        }
+      } catch(ex) {}
+      filter.isLoading = false;
     },
     /**
    * @function Update row filter status

@@ -12,7 +12,7 @@
         :style="{ top: y, left: x }"
         ref="content"
       >
-        <div v-if="type !== 'daterange'" class="filter-body">
+        <div v-if="['checkbox', 'radio'].includes(type || 'checkbox')" class="filter-body">
           <div  v-for="(item, index) in filters" :key="index" class="filter-item flex-c">
             <div 
               class="filter-check flex-c-c"
@@ -23,6 +23,37 @@
             </div>
             <span class="filter-text">{{ item.text }}</span>
           </div>
+        </div>
+        <div v-if="['select', 'multiselect'].includes(type)" class="filter-body">
+          <multiselect
+            v-model="selectedOptions" 
+            label="text"
+            track-by="value"
+            placeholder="Search..."
+            open-direction="bottom"
+            :options="options"
+            :multiple="type === 'multiselect'"
+            :searchable="true"
+            :loading="isLoading"
+            :internal-search="internalSearch"
+            :clear-on-select="false"
+            :close-on-select="true"
+            :optionHeight="35"
+            :limit="5"
+            :limitText="limitSelectText"
+            :max-height="600"
+            :show-no-results="true"
+            :show-labels="false"
+            :hide-selected="type === 'multiselect'"
+            @input="onOptionSelect"
+            @search-change="onSearch"
+          >
+
+            <template slot="clear" slot-scope="props">
+              <div class="multiselect__clear" v-if="filters.length" @mousedown.prevent.stop="clearAll(props.search)"></div>
+            </template>
+            <span slot="noResult">No elements found.</span>
+          </multiselect>
         </div>
         <div v-if="type === 'daterange'" class="filter-body">
           <date-picker
@@ -98,12 +129,14 @@
 </template>
 
 <script>
-import Display from '../utils/display.js'
-import DatePicker from 'v-calendar/lib/components/date-picker.umd'
+import Display from '../utils/display.js';
+import { debounce } from '../utils/util.js';
+import DatePicker from 'v-calendar/lib/components/date-picker.umd';
+import Multiselect from 'vue-multiselect';
 
 export default {
   name: 'FilterPanel',
-  components: { DatePicker },
+  components: { DatePicker, Multiselect },
   data() {
     return {
       isShow: { value: false },
@@ -115,15 +148,19 @@ export default {
       activeEle: null,
       filters: [],
       filterable: false,
-      checkedCache: [],
       dateRange: null,
+      options: [],
+      selectedOptions: [],
+      internalSearch: true,
+      isLoading: false,
     }
   },
   props: {
-    disabled: { type: Boolean,default: false },
+    disabled: { type: Boolean, default: false },
     content: { type: Array, default: () => [] },
     type: { type: String, default: () => 'checkbox' },
-    lang: { type: String, default: 'en_US' }
+    search: { type: Function, default: undefined },
+    lang: { type: String, default: 'en_US' },
   },
   watch: {
     disabled (value) {
@@ -131,14 +168,17 @@ export default {
     },
     content: {
       handler (value) {
-        if (!Array.isArray(value)) return
+        if (!Array.isArray(value)) return;
 
-        this.checkedCache = []
-        this.filters.splice(0, this.filters.length)
-        for (let i = 0; i < value.length; i++) {
-          let item = value[i]
-          if (item && typeof item.text === 'string' && typeof item.value !== 'undefined') {
-            this.filters.push(item)
+        this.filters.splice(0, this.filters.length);
+        if (['select', 'multiselect'].includes(this.type)) {
+          this.options = value;
+        } else {
+          for (let i = 0; i < value.length; i++) {
+            let item = value[i];
+            if (item && typeof item.text === 'string' && typeof item.value !== 'undefined') {
+              this.filters.push(item);
+            }
           }
         }
 
@@ -158,13 +198,14 @@ export default {
     }
   },
   mounted () {
+    this.internalSearch = this.search ? false : true;
+    this.selectedOptions = this.type === 'multiselect' ? [] : null;
     this.init()
   },
   beforeDestroy () {
     this.emitEle = null
     this.activeEle = null
     this.filters = []
-    this.checkedCache = []
 
     if (this.display && this.display.unBind) {
       this.display.unBind()
@@ -204,9 +245,10 @@ export default {
       return coord
     },
     handleEnter () {
-      let coord = this.getContextCoordinate(this.display.activeX, this.display.activeY)
-      this.x = coord[0] + 'px'
-      this.y = coord[1] + 'px'
+      let coord = this.getContextCoordinate(this.display.activeX, this.display.activeY);
+      this.x = coord[0] + 'px';
+      this.y = coord[1] + 'px';
+      this.$emit('enter');
     },
     handleAfterEnter () {
       this.$emit('after-enter')
@@ -235,6 +277,10 @@ export default {
         this.dateRange = null;
       }
 
+      if (['select', 'multiselect'].includes(this.type) && Array.isArray(this.selectedOptions)) {
+        this.selectedOptions.splice(0, this.selectedOptions.length);
+      }
+
       this.filters.forEach(f => { f.checked = false });
       this.$emit('reset', '');
       this.isShow.value = false;
@@ -251,10 +297,37 @@ export default {
         end: this.dateRange.end,
       };
     },
+    limitSelectText(count) {
+      return `and ${count} other`;
+    },
+    onOptionSelect(option) {
+      this.filters.splice(0, this.filters.length);
+      if (this.type === 'multiselect' && Array.isArray(this.selectedOptions)) {
+        this.selectedOptions.map(i => ({
+          checked: true,
+          text: i.text,
+          value: i.value,
+        })).forEach(i => {
+          this.filters.push(i);
+        });
+      } else if (option) {
+        this.filters.push({
+          checked: true,
+          text: option.text,
+          value: option.value,
+        });
+      }
+    },
+    onSearch: debounce(async function (searchValue) {
+      if (!this.search) {
+        return;
+      }
+
+      this.$emit('search', this, searchValue);
+    }, 300),
   }
 }
 </script>
-
 <style lang="scss" scoped>
 $textColor: rgba(0,0,0,0.85);
 $normalColor: rgba(0,0,0,0.65);
@@ -415,4 +488,91 @@ $fontFamily: Arial, Helvetica, sans-serif;
 .w-4 { width: 1rem; }
 .mx-2 { margin-left: .5rem; margin-right: .5rem; }
 .h-full { height: 100%; }
+</style>
+
+<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
+<style lang="scss">
+.multiselect {
+  font-family: inherit;
+  width: 280px;
+  min-height: 35px;
+}
+
+.multiselect__placeholder {
+  font-weight: 400;
+  margin-bottom: 8px;
+  padding: 4px 0 0 5px;
+}
+
+.multiselect,
+.multiselect__input,
+.multiselect__single {
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.multiselect__current,
+.multiselect__select {
+  line-height: 14px !important;
+  width: 28px !important;
+  height: 33px !important;
+  padding: 2px 6px !important;
+}
+
+.multiselect__spinner {
+  right: 3px;
+  width: 30px;
+  height: 33px;
+  &::before {
+    animation: spinning 1.8s cubic-bezier(.41,.26,.2,.62);
+  }
+  &::after {
+    animation: spinning 1.8s cubic-bezier(.51,.09,.21,.8);
+  }
+  &::before, &::after {
+    margin: -10px 0 0 -8px;
+    border-top-color: #046FDB;
+    width: 12px;
+    height: 12px;
+    animation-iteration-count: infinite;
+  }
+}
+
+.multiselect__tags {
+  min-height: 35px;
+  padding: 6px 28px 0 6px;
+
+  .multiselect__tag {
+    font-weight: 400;
+    font-size: 13px;
+    margin-bottom: 4px;
+    margin-right: 4px;
+    background: #2a9df4;
+    > .multiselect__tag-icon {
+      &::after {
+        color: white;
+      }
+      &:hover {
+        background: #046FDB;
+      }
+    }
+  }
+}
+
+.multiselect__option {
+  min-height: 35px;
+  padding: 10px;
+  &.multiselect__option--highlight {
+    background: #2a9df4;
+  }
+  &.multiselect__option--highlight::after {
+    line-height: 35px;
+    background: #2a9df4;
+  }
+}
+
+.multiselect__element {
+  font-weight: 400;
+}
+
 </style>
