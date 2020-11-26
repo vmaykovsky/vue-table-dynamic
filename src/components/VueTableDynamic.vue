@@ -1411,7 +1411,7 @@ export default {
       filter.isLoading = true;
       try {
         const result = await filter.search(searchValue, {
-          searchValue: this.searchValue,
+          search: this.searchValue,
           filter: this.filterConfig,
           sort: this.getSort(),
           page: this.currentPage,
