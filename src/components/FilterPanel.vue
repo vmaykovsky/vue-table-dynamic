@@ -277,8 +277,10 @@ export default {
         this.dateRange = null;
       }
 
-      if (['select', 'multiselect'].includes(this.type) && Array.isArray(this.selectedOptions)) {
-        this.selectedOptions.splice(0, this.selectedOptions.length);
+      if (['select', 'multiselect'].includes(this.type)) {
+        Array.isArray(this.selectedOptions) 
+          ? this.selectedOptions.splice(0, this.selectedOptions.length)
+          : this.selectedOptions = null;
       }
 
       this.filters.forEach(f => { f.checked = false });
