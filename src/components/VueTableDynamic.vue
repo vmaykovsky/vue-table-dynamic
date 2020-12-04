@@ -110,7 +110,9 @@
                     @search="(filter, searchValue) => { onFilterSearch(filter, searchValue) }"
                   >
                     <i slot="reference" class="iconfont icondown"
-                      :style="{ color: activatedFilter[j] ? activedColor : '#C0C4CC' }">
+                      :style="{ color: activatedFilter[j] ? activedColor : '#C0C4CC' }"
+                      :class="{ active: activatedFilter[j] ? true : false }"
+                    >
                     </i>
                   </filter-panel>
                 </span>
@@ -291,6 +293,7 @@
                   >
                     <i slot="reference" class="iconfont icondown" 
                       :style="{ color: activatedFilter[j] ? activedColor : '#C0C4CC' }"
+                      :class="{ active: activatedFilter[j] ? true : false }"
                     >
                     </i>
                   </filter-panel>
@@ -2118,8 +2121,14 @@ $fontFamily: Arial, Helvetica, sans-serif;
   i.iconfont{
     font-size: 12px;
   }
+  i.iconfont.active{
+    font-size: 12px;
+    background-color: rgba(4, 111, 219, 0.15);
+    border-radius: 2px;
+  }
   i.iconfont.activated{
     color: $activeColor;
+    
   }
 }
 
