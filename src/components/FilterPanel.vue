@@ -33,6 +33,8 @@
             open-direction="bottom"
             :options="options"
             :multiple="type === 'multiselect'"
+            :taggable="type !== 'multiselect'"
+            tagPlaceholder="Press 'enter'"
             :searchable="true"
             :loading="isLoading"
             :internal-search="internalSearch"
@@ -47,6 +49,7 @@
             :hide-selected="type === 'multiselect'"
             @input="onOptionSelect"
             @search-change="onSearch"
+            @tag="onAddTag"
           >
 
             <template slot="clear" slot-scope="props">
@@ -327,6 +330,16 @@ export default {
 
       this.$emit('search', this, searchValue);
     }, 300),
+    onAddTag(tagValue) {
+      this.filters.splice(0, this.filters.length)
+      this.filters.push({
+        checked: true,
+        text: tagValue,
+        value: tagValue,
+      });
+
+      this.selectedOptions = { text: tagValue, value: tagValue };
+    },
   }
 }
 </script>
