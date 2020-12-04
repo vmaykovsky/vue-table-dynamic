@@ -3,6 +3,9 @@ const merge = require("webpack-merge")
 const baseWebpackConfig = require("./webpack.base.conf")
 
 module.exports = merge(baseWebpackConfig, {
+  externals: {
+    vue: 'Vue'
+  },
   entry: path.resolve(__dirname, '../src/index.js'),
   output: {
     path: path.resolve(__dirname, "../dist"),
