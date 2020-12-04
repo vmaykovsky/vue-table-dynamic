@@ -33,7 +33,7 @@
             open-direction="bottom"
             :options="options"
             :multiple="type === 'multiselect'"
-            :taggable="type !== 'multiselect'"
+            :taggable="false"
             tagPlaceholder="Press 'enter'"
             :searchable="true"
             :loading="isLoading"
