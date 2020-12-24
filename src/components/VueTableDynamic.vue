@@ -663,7 +663,7 @@ export default {
             && (['datetime', 'select', 'multiselect'].includes(f.type) || unemptyArray(f.content))
           ) {
             if (f.content.every(c => { return (c && typeof c.text === 'string' && typeof c.value !== 'undefined') })) {
-              let content = f.content.map(c => { return { ...c, checked: false, key: unique(`content-`) } })
+              let content = f.content.map(c => { return { ...c, checked: c.checked || false, key: unique(`content-`) } })
               filterObj[f.column] = { ...f, content, key: unique(`filter-`) }
             }
           }
