@@ -193,7 +193,7 @@
                 </div>
                 <div v-if="rowContextMenu && rowContextMenu.length && rowContextMenu.length > i - (headerInfirstRow ? 1 : 0)"
                   class="flex-c-c row-actions"
-                  :style="getCellStyle(tableRow.index, j)"
+                  :style="getCellStyle(tableRow.index, j, true)"
                 >
                   <context-menu
                     v-if="rowContextMenu[i - (headerInfirstRow ? 1 : 0)] && rowContextMenu[i - (headerInfirstRow ? 1 : 0)].length"
@@ -948,10 +948,14 @@ export default {
     /**
    * @function Get cell style data
    */
-    getCellStyle (rowIndex, columnIndex) {
+    getCellStyle (rowIndex, columnIndex, isContextMenu) {
       let style = {}
       if (this.isHighlighted(rowIndex, columnIndex)) {
         style.backgroundColor = this.highlightedColor
+      }
+
+      if (isContextMenu) {
+        return style;
       }
 
       if (this.columnWidth[columnIndex]) {
