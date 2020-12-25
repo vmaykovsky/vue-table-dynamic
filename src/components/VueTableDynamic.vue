@@ -191,7 +191,10 @@
                     </span>
                   </slot>
                 </div>
-                <div v-if="rowContextMenu && rowContextMenu.length && rowContextMenu.length > i - (headerInfirstRow ? 1 : 0)" class="flex-c-c row-actions">
+                <div v-if="rowContextMenu && rowContextMenu.length && rowContextMenu.length > i - (headerInfirstRow ? 1 : 0)"
+                  class="flex-c-c row-actions"
+                  :style="getCellStyle(tableRow.index, j)"
+                >
                   <context-menu
                     v-if="rowContextMenu[i - (headerInfirstRow ? 1 : 0)] && rowContextMenu[i - (headerInfirstRow ? 1 : 0)].length"
                     :content="rowContextMenu[i - (headerInfirstRow ? 1 : 0)]"
