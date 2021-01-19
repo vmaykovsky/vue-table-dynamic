@@ -934,6 +934,7 @@ The `filter` param structure (read more in [Filter](#filter) section):
 | `pageSizes` | options of row count per page | `Array<number>`  | - | `[10, 20, 50, 100]`|
 | `showTotal` | show total count of  pagination  | `boolean`  | `true`/`false` | `false`   |
 | `scrollbar` | display of scroll bar | `string`  | `show/hover/hidden` | `show` |
+| `resetStateWhenUpdateProps` | reset table state when update any prop | `boolean`  | - | `false` |
 
 ### Methods
 
@@ -957,6 +958,7 @@ The `filter` param structure (read more in [Filter](#filter) section):
 | `cell-contextmenu` | event when opening a cell's context menu | `rowIndex:number`; `columnIndex:number`; ` data:string\number` |
 | `cell-change` | event when edting a cell | `rowIndex:number`; `columnIndex:number`; `data:string\number` |
 | `sort-change` | event when sorting | `index: number`; `value: string` |
+| `on-update` | event when update data via remote data source | `data: Array<Array<object>>`; `totalItems: number`; `contextMenu: Array<Array<object>>` |
 
 
 

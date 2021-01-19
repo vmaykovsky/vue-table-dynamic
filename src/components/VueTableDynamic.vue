@@ -723,9 +723,11 @@ export default {
   watch: {
     params: {
       handler (value) {
-        this.searchValue = ''
-        this.activatedSort = {}
-        this.activatedFilter = {}
+        if (value.resetStateWhenUpdateProps) {
+          this.searchValue = '';
+          this.activatedSort = {};
+          this.activatedFilter = {};
+        }
       },
       deep: true,
       immediate: true
@@ -749,6 +751,7 @@ export default {
               this.initData(data, totalItems);
             });
             this.isLoading = false;
+            this.$nextTick(() => this.onUpdate(data, totalItems, contextMenu));
           })
           .catch(() => {
             this.isLoading = false;
@@ -879,12 +882,13 @@ export default {
       if (this.remoteDataSource && this.remoteDataHandler && this.currentPage !== page) {
         this.isLoading = true;
         this.remoteDataHandler(this.searchValue, this.filterConfig, this.getSort(), page, this.pageSize)
-          .then(({ data, contextMenu }) => {
+          .then(({ data, totalItems, contextMenu }) => {
             this.$nextTick(() => { 
               this.rowContextMenu = contextMenu;
               this.initData(data, undefined, true);
             });
             this.isLoading = false;
+            this.$nextTick(() => this.onUpdate(data, totalItems, contextMenu));
           })
           .catch(() => {
             this.isLoading = false;
@@ -922,6 +926,7 @@ export default {
               this.initData(data, totalItems);
             });
             this.isLoading = false;
+            this.$nextTick(() => this.onUpdate(data, totalItems, contextMenu));
           })
           .catch(() => {
             this.isLoading = false;
@@ -1298,12 +1303,13 @@ export default {
       if (this.remoteDataSource && this.remoteDataHandler) {
         this.isLoading = true;
         this.remoteDataHandler(this.searchValue, this.filterConfig, { columnIndex: index, order: value }, this.currentPage, this.pageSize)
-          .then(({ data, contextMenu }) => {
+          .then(({ data, totalItems, contextMenu }) => {
             this.$nextTick(() => { 
               this.rowContextMenu = contextMenu;
               this.initData(data, undefined, true);
             });
             this.isLoading = false;
+            this.$nextTick(() => this.onUpdate(data, totalItems, contextMenu));
           })
           .catch(() => {
             this.isLoading = false;
@@ -1388,6 +1394,7 @@ export default {
               this.initData(data, totalItems);
             });
             this.isLoading = false;
+            this.$nextTick(() => this.onUpdate(data, totalItems, contextMenu));
           })
           .catch(() => {
             this.isLoading = false;
@@ -1484,6 +1491,7 @@ export default {
               this.initData(data, totalItems);
             });
             this.isLoading = false;
+            this.$nextTick(() => this.onUpdate(data, totalItems, contextMenu));
           })
           .catch(() => {
             this.isLoading = false;
@@ -1830,7 +1838,14 @@ export default {
     onChangePosition (movement) {
       let next = movement / 100
       this.$refs.scrollbar.scrollToX(next * this.bodyViewerWidth)
-    }
+    },
+    onUpdate (data, totalItems, contextMenu) {
+      if (this.params.highlight) {
+        this.params.highlight.row = [];
+        this.params.highlight.cell = [];
+      }
+      this.$emit('on-update', data, totalItems, contextMenu);
+    },
   },
   components: { VueInput, FilterPanel, ContextMenu, VuePagination, VueScrollbar, HorizontalScrollbar }
 }
