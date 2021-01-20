@@ -507,34 +507,34 @@ $fontFamily: Arial, Helvetica, sans-serif;
 
 <style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
 <style lang="scss">
-.multiselect {
+.filter-body .multiselect {
   font-family: inherit;
   width: 280px;
   min-height: 35px;
 }
 
-.multiselect__placeholder {
+.filter-body .multiselect__placeholder {
   font-weight: 400;
   margin-bottom: 8px;
   padding: 4px 0 0 5px;
 }
 
-.multiselect,
-.multiselect__input,
-.multiselect__single {
+.filter-body .multiselect,
+.filter-body .multiselect__input,
+.filter-body .multiselect__single {
   font-size: 14px;
   margin-bottom: 4px;
 }
 
-.multiselect__current,
-.multiselect__select {
+.filter-body .multiselect__current,
+.filter-body .multiselect__select {
   line-height: 14px !important;
   width: 28px !important;
   height: 33px !important;
   padding: 2px 6px !important;
 }
 
-.multiselect__spinner {
+.filter-body .multiselect__spinner {
   right: 3px;
   width: 30px;
   height: 33px;
@@ -553,7 +553,7 @@ $fontFamily: Arial, Helvetica, sans-serif;
   }
 }
 
-.multiselect__tags {
+.filter-body .multiselect__tags {
   min-height: 35px;
   padding: 6px 28px 0 6px;
 
@@ -574,7 +574,7 @@ $fontFamily: Arial, Helvetica, sans-serif;
   }
 }
 
-.multiselect__option {
+.filter-body .multiselect__option {
   min-height: 35px;
   padding: 10px;
   &.multiselect__option--highlight {
@@ -586,7 +586,7 @@ $fontFamily: Arial, Helvetica, sans-serif;
   }
 }
 
-.multiselect__element {
+.filter-body .multiselect__element {
   font-weight: 400;
 }
 
