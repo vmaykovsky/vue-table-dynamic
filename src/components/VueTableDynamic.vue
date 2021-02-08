@@ -40,6 +40,7 @@
             @mouseenter="onMouseenter(tableData.rows[0])" 
             @mouseleave="onMouseleave(tableData.rows[0])"
             @click="onClickRow(tableData.rows[0], 0)"
+            @dblclick.exact.stop="onDblClickRow(tableData.rows[0], 0)"
           >
             <div 
               v-if="showCheck" 
@@ -62,7 +63,7 @@
               :class="{ 'v-show-border': tableBorder, 'is-header': (j === 0 && headerInfirstColumn) }"
               :style="getCellStyle(0, j)"
               @click="onClickCell(tableCell, 0, j)"
-              @dblclick.exact.stop="onDblclickCell(tableCell, 0, j)"
+              @dblclick.exact="onDblclickCell(tableCell, 0, j)"
               @contextmenu.stop.prevent="onContextmenuCell($event, tableCell, 0, j)"
             >
               <span 
@@ -148,6 +149,7 @@
                 @mouseenter="onMouseenter(tableRow)" 
                 @mouseleave="onMouseleave(tableRow)"
                 @click="onClickRow(tableRow, tableRow.index)"
+                @dblclick.exact.stop="onDblClickRow(tableRow, tableRow.index)"
               >
                 <div 
                   v-if="showCheck" 
@@ -169,7 +171,7 @@
                   :class="{ 'v-show-border': tableBorder, 'is-header': (j === 0 && headerInfirstColumn ) }"
                   :style="getCellStyle(tableRow.index, j)"
                   @click="onClickCell(tableCell, tableRow.index, j)"
-                  @dblclick.exact.stop="onDblclickCell(tableCell, tableRow.index, j)"
+                  @dblclick.exact="onDblclickCell(tableCell, tableRow.index, j)"
                   @contextmenu.stop.prevent="onContextmenuCell($event, tableCell, tableRow.index, j)"
                 >
                   <slot 
@@ -225,6 +227,7 @@
             @mouseenter="onMouseenter(tableData.rows[0])" 
             @mouseleave="onMouseleave(tableData.rows[0])"
             @click="onClickRow(tableData.rows[0], 0)"
+            @dblclick.exact.stop="onDblClickRow(tableData.rows[0], 0)"
           >
             <div 
               v-if="showCheck" 
@@ -247,7 +250,7 @@
               :class="{ 'v-show-border': tableBorder, 'is-header': (j === 0 && headerInfirstColumn) }"
               :style="getCellStyle(0, j)"
               @click="onClickCell(tableCell, 0, j)"
-              @dblclick.exact.stop="onDblclickCell(tableCell, 0, j)"
+              @dblclick.exact="onDblclickCell(tableCell, 0, j)"
               @contextmenu.stop.prevent="onContextmenuCell($event, tableCell, 0, j)"
             >
               <span 
@@ -320,6 +323,7 @@
                   @mouseenter="onMouseenter(tableRow, true)" 
                   @mouseleave="onMouseleave(tableRow, true)"
                   @click="onClickRow(tableRow, tableRow.index)"
+                  @dblclick.exact.stop="onDblClickRow(tableRow, tableRow.index)"
                 >
                   <div 
                     v-if="showCheck" 
@@ -341,7 +345,7 @@
                     :class="{ 'v-show-border': tableBorder, 'is-header': (j === 0 && headerInfirstColumn ) }"
                     :style="getCellStyle(tableRow.index, j)"
                     @click="onClickCell(tableCell, tableRow.index, j)"
-                    @dblclick.exact.stop="onDblclickCell(tableCell, tableRow.index, j)"
+                    @dblclick.exact="onDblclickCell(tableCell, tableRow.index, j)"
                     @contextmenu.stop.prevent="onContextmenuCell($event, tableCell, tableRow.index, j)"
                   >
                     <slot 
@@ -1203,6 +1207,9 @@ export default {
    */
     onClickRow (tableRow, rowIndex) {
       this.$emit('row-click', this.headerInfirstRow ? rowIndex - 1 : rowIndex, this.getRowDataFromTableRow(tableRow))
+    },
+    onDblClickRow (tableRow, rowIndex) {
+      this.$emit('row-dblclick', this.headerInfirstRow ? rowIndex - 1 : rowIndex, this.getRowDataFromTableRow(tableRow))
     },
     /**
    * @function Mouse enters Row event
